@@ -8,17 +8,8 @@ app.set("view engine", "ejs");
 app.set("views","views");
 let sql,binds,options,result;
 let connection;
-app.listen(1522,() =>{
-    console.log("server ready");
-})
-
-app.get("/",(req,res) =>{
-    connectDb();
-    datas = JSON.parse(JSON.stringify(result["rows"]));
-    res.render("index",{datas:datas,title:"OracleDb Simulation"});
-})
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-
+connectDb();
 
 async function connectDb(){
   try {
@@ -27,7 +18,7 @@ async function connectDb(){
       password      : "tubes",
       connectString : "localhost/xe"
     });
-    sql = `SELECT nama_buku,genre_buku,jenis_buku FROM buku`;
+    sql = `SELECT nama_buku,genre_buku,jenis_buku from buku`;
 
     binds = {};
 
@@ -40,7 +31,9 @@ async function connectDb(){
     };
 
     result = await connection.execute(sql, binds, options);
-    console.log(result);
   } catch (err) {
     console.error(err);}
+    console.log(result);
   }
+
+
