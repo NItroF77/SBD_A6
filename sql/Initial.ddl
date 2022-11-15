@@ -102,11 +102,9 @@ ALTER TABLE pelanggan ADD CONSTRAINT pelanggan_pk PRIMARY KEY ( id_pelanggan );
 CREATE TABLE penulis (
     nama VARCHAR2(30 CHAR) NOT NULL
 );
-
 CREATE TABLE "penulis-buku" (
     buku_nama_buku VARCHAR2(30 CHAR) NOT NULL
 );
-
 ALTER TABLE "penulis-buku" ADD CONSTRAINT "penulis-buku_PK" PRIMARY KEY ( buku_nama_buku );
 
 CREATE TABLE perawatan (
