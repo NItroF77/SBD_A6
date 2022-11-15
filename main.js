@@ -23,11 +23,11 @@ oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 async function connectDb(){
   try {
     connection = await oracledb.getConnection( {
-      user          : "user1",
-      password      : "user1",
+      user          : "tubes",
+      password      : "tubes",
       connectString : "localhost/xe"
     });
-    sql = `SELECT * FROM no_example`;
+    sql = `SELECT nama_buku,genre_buku,jenis_buku FROM buku`;
 
     binds = {};
 
