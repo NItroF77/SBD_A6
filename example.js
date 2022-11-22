@@ -1,4 +1,4 @@
-/* Copyright (c) 2018, 2022, Oracle and/or its affiliates. */
+/* Copyright (c) 2015, 2022, Oracle and/or its affiliates. */
 
 /******************************************************************************
  *
@@ -16,25 +16,21 @@
  * limitations under the License.
  *
  * NAME
- *   example.js
+ *   resultset1.js
  *
  * DESCRIPTION
- *   A basic node-oracledb example using Node.js 8's async/await syntax.
+ *   Executes a query and uses a ResultSet to fetch rows with getRow().
  *
- *   For connection pool examples see connectionpool.js and webapp.js
- *   For a ResultSet example see resultset1.js
- *   For a query stream example see selectstream.js
+ *   This example requires node-oracledb 2.0.15 or later.
  *
- *   This example requires node-oracledb 5 or later.
+ *   This example uses Node 8's async/await syntax.
  *
  *****************************************************************************/
-
-// Using a fixed Oracle time zone helps avoid machine and deployment differences
-process.env.ORA_SDTZ = 'UTC';
 
 const fs = require('fs');
 const oracledb = require('oracledb');
 const dbConfig = require('./dbconfig.js');
+const demoSetup = require('./demosetup.js');
 
 // On Windows and macOS, you can specify the directory containing the Oracle
 // Client Libraries at runtime, or before Node.js starts.  On other platforms
@@ -55,87 +51,33 @@ async function run() {
   let connection;
 
   try {
-
-    let sql, binds, options, result;
-
     connection = await oracledb.getConnection(dbConfig);
 
-    //
-    // Create a table
-    //
+    await demoSetup.setupBf(connection);  // create the demo table
 
-    const stmts = [
-      `DROP TABLE no_example`,
-
-      `CREATE TABLE no_example (id NUMBER, data VARCHAR2(20))`
-    ];
-
-    for (const s of stmts) {
-      try {
-        await connection.execute(s);
-      } catch (e) {
-        if (e.errorNum != 942)
-          console.error(e);
+    const result = await connection.execute(
+      `SELECT id, farmer
+       FROM no_banana_farmer
+       ORDER BY id`,
+      [], // no bind variables
+      {
+        resultSet: true,             // return a ResultSet (default is false)
+        // prefetchRows:   100,      // internal buffer allocation size for tuning
+        // fetchArraySize: 100       // internal buffer allocation size for tuning
       }
+    );
+
+    const rs = result.resultSet;
+    let row;
+    let i = 1;
+
+    while ((row = await rs.getRow())) {
+      console.log("getRow(): row " + i++);
+      console.log(row);
     }
 
-    //
-    // Insert three rows
-    //
-
-    sql = `INSERT INTO no_example VALUES (:1, :2)`;
-
-    binds = [
-      [101, "Alpha" ],
-      [102, "Beta" ],
-      [103, "Gamma" ]
-    ];
-
-    // For a complete list of options see the documentation.
-    options = {
-      autoCommit: true,
-      // batchErrors: true,  // continue processing even if there are data errors
-      bindDefs: [
-        { type: oracledb.NUMBER },
-        { type: oracledb.STRING, maxSize: 20 }
-      ]
-    };
-
-    result = await connection.executeMany(sql, binds, options);
-
-    console.log("Number of rows inserted:", result.rowsAffected);
-
-    //
-    // Query the data
-    //
-
-    sql = `SELECT * FROM no_example`;
-
-    binds = {};
-
-    // For a complete list of options see the documentation.
-    options = {
-      outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
-      // extendedMetaData: true,               // get extra metadata
-      // prefetchRows:     100,                // internal buffer allocation size for tuning
-      // fetchArraySize:   100                 // internal buffer allocation size for tuning
-    };
-
-    result = await connection.execute(sql, binds, options);
-
-    console.log("Metadata: ");
-    console.dir(result.metaData, { depth: null });
-    console.log("Query results: ");
-    console.dir(result.rows, { depth: null });
-
-    //
-    // Show the date.  The value of ORA_SDTZ affects the output
-    //
-
-    sql = `SELECT TO_CHAR(CURRENT_DATE, 'DD-Mon-YYYY HH24:MI') AS CD FROM DUAL`;
-    result = await connection.execute(sql, binds, options);
-    console.log("Current date query results: ");
-    console.log(result.rows[0]['CD']);
+    // always close the ResultSet
+    await rs.close();
 
   } catch (err) {
     console.error(err);
