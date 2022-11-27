@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <script src="assets/jquery.js"></script>
+    <script>
+        $(function () {
+            $("#navbar").load("elements/navigation.html");
+        });
+    </script>
+    <div id="navbar"></div>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="left-page">
+            <P>hELLO</P>
+        </div>
+        <div class="mid-page">
+            <ul>
+                <%for (let data of datas) {%>
+                    <li>
+                        <%=data.NAMA_BUKU%> - <%=data.GENRE_BUKU%> - <%=data.JENIS_BUKU%>
+                    </li>
+                    <%}%>
+            </ul>
+            <div class="row">
+                <div class="col-sm">
+                    <form action="/add_buku" method="get">
+                        <button type="submit" class="btn btn-primary">Tambah Buku</button>
+                    </form>
+                </div>
+                <div class="col-sm">
+                    <form action="/add_author" method="get">
+                        <button type="submit" class="btn btn-primary">Tambah Teknisi</button>
+                    </form>
+                </div>
+                <div class="col-sm">
+                    <form action="/add_pustakawan" method="get">
+                        <button type="submit" class="btn btn-primary">Tambah Pustakawan</button>
+                    </form>
+                </div>
+                <div class="col-sm">
+                    <form action="/add_teknisi" method="get">
+                        <button type="submit" class="btn btn-primary">Tambah Teknisi</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="right-page">
+            <P>hELLO</P>
+        </div>
+    </div>
+   
+</body>
+</html>

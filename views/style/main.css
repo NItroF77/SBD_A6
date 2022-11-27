@@ -1,0 +1,48 @@
+body {
+    justify-content: center;
+}
+.container div{
+  padding: 5px;
+  border: 1px solid black;
+}
+.left-page{
+    float: left;
+    width: 15%;
+}
+.mid-page{
+    float: left;
+    width: 70%;
+    display: grid;
+}
+.right-page{
+    float: right;
+    width: 15%;
+}
+
+.nav{
+    border: 20px solid black;
+}
+.book{
+    font-size: 0.9em;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(5,minmax(160px,1fr));
+    grid-auto-rows: auto;     
+}
+ 
+.card {
+    font-size: 0.9em;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+} 
+.card-title{
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}

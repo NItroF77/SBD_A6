@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
-    <title>tes</title>
-    <h1><%= title %></h1>
-    <div>
-        <ul>
-            <% if (datas != undefined) {%>
-            <%for (let data of datas) {%>
-            <li><%=data.NAMA_BUKU%> - <%=data.GENRE_BUKU%> - <%=data.JENIS_BUKU%></li>
-            <% } %>
-            <%}%>
-        </ul>
-    </div>
-    <div>
-        <form action="/add_buku" method="get">
-            <button type="submit" class="btn btn-primary">Tambah Buku</button>
-        </form>
-        <form action="/add_author" method="get">
-            <button type="submit" class="btn btn-primary">Tambah Teknisi</button>
-        </form>
-        <form action="/add_pustakawan" method="get">
-            <button type="submit" class="btn btn-primary">Tambah Pustakawan</button>
-        </form>
-        <form action="/add_teknisi" method="get">
-            <button type="submit" class="btn btn-primary">Tambah Teknisi</button>
-        </form>
-    </div>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <div id="navbar"></div>
 </head>
 <body>
-    
+    <div class="container-fluid">
+        <div class="left-page">
+            <div id="panel"></div>
+        </div>
+        <div class="mid-page">
+            <div class="cards">
+                <%for (let data of datas) {%>
+                    <div class="card border-secondary mb-3" style="width: 160px;">
+                      <div class="card-body">
+                        <h5 class="card-title"><%=data.NAMA_BUKU%></h5>
+                        <p class="card-text"><%=data.GENRE_BUKU%></p>
+                        <p class="card-text"><small class="text-muted"><%=data.JENIS_BUKU%></small></p>
+                      </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        <div class="right-page">
+            <P>hELLO</P>
+        </div>
+    </div>
+   
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            $("#navbar").load("elements/navigation.html");
+            $("#panel").load("elements/user-panel.html");
+        });
+    </script>
 </body>
+
+
 </html>
