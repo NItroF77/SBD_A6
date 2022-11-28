@@ -1,0 +1,1177 @@
+--------------------------------------------------------
+--  File created - Minggu-November-27-2022   
+--------------------------------------------------------
+DROP TABLE "TUBES"."BUKU" cascade constraints;
+DROP TABLE "TUBES"."LAYANAN" cascade constraints;
+DROP TABLE "TUBES"."MEMBERSHIP" cascade constraints;
+DROP TABLE "TUBES"."MESIN" cascade constraints;
+DROP TABLE "TUBES"."mesin-dipinjam" cascade constraints;
+DROP TABLE "TUBES"."p-buku" cascade constraints;
+DROP TABLE "TUBES"."P_BUKU" cascade constraints;
+DROP TABLE "TUBES"."PELANGGAN" cascade constraints;
+DROP TABLE "TUBES"."PENULIS" cascade constraints;
+DROP TABLE "TUBES"."penulis-buku" cascade constraints;
+DROP TABLE "TUBES"."PERAWATAN" cascade constraints;
+DROP TABLE "TUBES"."plg-plg" cascade constraints;
+DROP TABLE "TUBES"."P_MESIN" cascade constraints;
+DROP TABLE "TUBES"."PUSTAKAWAN" cascade constraints;
+DROP TABLE "TUBES"."RAK" cascade constraints;
+DROP TABLE "TUBES"."STOK_BUKU" cascade constraints;
+DROP TABLE "TUBES"."TEKNISI" cascade constraints;
+DROP PROCEDURE "TUBES"."ADDBUKU";
+DROP PROCEDURE "TUBES"."ADDPENULIS";
+DROP PROCEDURE "TUBES"."ADDSTOK";
+DROP PROCEDURE "TUBES"."DENDACOUNT";
+DROP PROCEDURE "TUBES"."OVERDUECHECK";
+DROP PROCEDURE "TUBES"."PINJAMBUKU";
+DROP PROCEDURE "TUBES"."PINJAMMESIN";
+DROP PROCEDURE "TUBES"."REGISTRASI";
+DROP PROCEDURE "TUBES"."REPAIRCHECK";
+DROP PROCEDURE "TUBES"."RETURNBOOK";
+DROP FUNCTION "TUBES"."AUTHORCHECK";
+--------------------------------------------------------
+--  DDL for Table BUKU
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."BUKU" 
+   (	"NAMA_BUKU" VARCHAR2(30 CHAR), 
+	"GENRE_BUKU" VARCHAR2(15 CHAR), 
+	"JENIS_BUKU" VARCHAR2(15 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table LAYANAN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."LAYANAN" 
+   (	"ID_LAYANAN" CHAR(10 CHAR), 
+	"PELANGGAN_ID_PELANGGAN" CHAR(10 CHAR), 
+	"TIPE" CHAR(1 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table MEMBERSHIP
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."MEMBERSHIP" 
+   (	"KODE_MEMBER" CHAR(10 CHAR), 
+	"TIPE_MEMBER" VARCHAR2(7 CHAR), 
+	"HARGA" NUMBER(*,0)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table MESIN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."MESIN" 
+   (	"ID_MESIN" VARCHAR2(10 CHAR), 
+	"TIPE_MESIN" VARCHAR2(15 CHAR), 
+	"KONDISI" VARCHAR2(1 CHAR), 
+	"STATUS_PEMINJAMAN" CHAR(1 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table mesin-dipinjam
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."mesin-dipinjam" 
+   (	"P_MESIN_ID_PEMINJAMAN" CHAR(10 CHAR), 
+	"MESIN_ID_MESIN" VARCHAR2(10 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table p-buku
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."p-buku" 
+   (	"P_BUKU_ID_PEMINJAMAN" CHAR(10 CHAR), 
+	"STOK_BUKU_ID_BUKU" CHAR(10 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table P_BUKU
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."P_BUKU" 
+   (	"ID_PEMINJAMAN" CHAR(10 CHAR), 
+	"START_DATE" DATE, 
+	"END_DATE" DATE, 
+	"IS_OVERDUE" CHAR(1 BYTE), 
+	"OVERDUE_DAYS" NUMBER(*,0), 
+	"DENDA" NUMBER(*,0), 
+	"LAYANAN_ID_LAYANAN" CHAR(10 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table PELANGGAN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."PELANGGAN" 
+   (	"ID_PELANGGAN" CHAR(10 CHAR), 
+	"NIK" CHAR(16 CHAR), 
+	"NAMA" VARCHAR2(30 CHAR), 
+	"JENIS_KELAMIN" CHAR(1 BYTE), 
+	"TGL_LAHIR" DATE, 
+	"ALAMAT" CLOB, 
+	"MEMBERSHIP_KODE_MEMBER" CHAR(10 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" 
+ LOB ("ALAMAT") STORE AS BASICFILE (
+  TABLESPACE "SYSTEM" ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
+  NOCACHE LOGGING 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)) ;
+--------------------------------------------------------
+--  DDL for Table PENULIS
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."PENULIS" 
+   (	"NAMA" VARCHAR2(30 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table penulis-buku
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."penulis-buku" 
+   (	"BUKU_NAMA_BUKU" VARCHAR2(30 CHAR), 
+	"PENULIS_NAMA" VARCHAR2(20 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table PERAWATAN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."PERAWATAN" 
+   (	"MESIN_ID_MESIN" VARCHAR2(10 CHAR), 
+	"TEKNISI_ID_TEKNISI" CHAR(10 CHAR), 
+	"START_DATE" TIMESTAMP (6), 
+	"END_DATE" TIMESTAMP (6)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table plg-plg
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."plg-plg" 
+   (	"PUSTAKAWAN_ID_PUSTAKAWAN" CHAR(10 CHAR), 
+	"PELANGGAN_ID_PELANGGAN" CHAR(10 CHAR), 
+	"WAKTU_PELAYANAN" DATE
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table P_MESIN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."P_MESIN" 
+   (	"ID_PEMINJAMAN" CHAR(10 CHAR), 
+	"START_TIME" TIMESTAMP (6) WITH TIME ZONE, 
+	"END_TIME" TIMESTAMP (6) WITH TIME ZONE, 
+	"LAYANAN_ID_LAYANAN" CHAR(10 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table PUSTAKAWAN
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."PUSTAKAWAN" 
+   (	"ID_PUSTAKAWAN" CHAR(10 CHAR), 
+	"NAMA" VARCHAR2(30 CHAR), 
+	"TGL_LAHIR" DATE, 
+	"ALAMAT" CLOB, 
+	"STATUS" CHAR(1 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" 
+ LOB ("ALAMAT") STORE AS BASICFILE (
+  TABLESPACE "SYSTEM" ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
+  NOCACHE LOGGING 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)) ;
+--------------------------------------------------------
+--  DDL for Table RAK
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."RAK" 
+   (	"ID_RAK" CHAR(10 CHAR), 
+	"LOKASI" VARCHAR2(15 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table STOK_BUKU
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."STOK_BUKU" 
+   (	"ID_BUKU" CHAR(10 CHAR), 
+	"BUKU_NAMA_BUKU" VARCHAR2(30 CHAR), 
+	"RAK_ID_RAK" CHAR(10 CHAR), 
+	"STATUS_PEMINJAMAN" CHAR(1 BYTE), 
+	"BARIS_RAK" CHAR(6 CHAR)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Table TEKNISI
+--------------------------------------------------------
+
+  CREATE TABLE "TUBES"."TEKNISI" 
+   (	"ID_TEKNISI" CHAR(10 CHAR), 
+	"NAMA" VARCHAR2(30 CHAR), 
+	"TGL_LAHIR" DATE, 
+	"ALAMAT" CLOB, 
+	"STATUS" CHAR(1 BYTE)
+   ) SEGMENT CREATION IMMEDIATE 
+  PCTFREE 10 PCTUSED 40 INITRANS 1 MAXTRANS 255 NOCOMPRESS LOGGING
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" 
+ LOB ("ALAMAT") STORE AS BASICFILE (
+  TABLESPACE "SYSTEM" ENABLE STORAGE IN ROW CHUNK 8192 RETENTION 
+  NOCACHE LOGGING 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)) ;
+REM INSERTING into TUBES.BUKU
+SET DEFINE OFF;
+Insert into TUBES.BUKU (NAMA_BUKU,GENRE_BUKU,JENIS_BUKU) values ('A','Horror','Novel');
+Insert into TUBES.BUKU (NAMA_BUKU,GENRE_BUKU,JENIS_BUKU) values ('Uzumaki','Horror','Manga');
+Insert into TUBES.BUKU (NAMA_BUKU,GENRE_BUKU,JENIS_BUKU) values ('Metamorphosis','Psychological','Doujinshi');
+Insert into TUBES.BUKU (NAMA_BUKU,GENRE_BUKU,JENIS_BUKU) values ('Kaguya-Sama Love is war','Romance','Manga');
+REM INSERTING into TUBES.LAYANAN
+SET DEFINE OFF;
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000001','0000000001',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000002','0000000002',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000003','0000000001',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000004','0000000003',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000005','0000000001',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000006','0000000002',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000007','0000000002',null);
+Insert into TUBES.LAYANAN (ID_LAYANAN,PELANGGAN_ID_PELANGGAN,TIPE) values ('L000000008','0000000001','2');
+REM INSERTING into TUBES.MEMBERSHIP
+SET DEFINE OFF;
+Insert into TUBES.MEMBERSHIP (KODE_MEMBER,TIPE_MEMBER,HARGA) values ('G000000001','GOLD','50000');
+Insert into TUBES.MEMBERSHIP (KODE_MEMBER,TIPE_MEMBER,HARGA) values ('S000000001','SILVER','25000');
+Insert into TUBES.MEMBERSHIP (KODE_MEMBER,TIPE_MEMBER,HARGA) values ('B000000001','BRONZE','0');
+REM INSERTING into TUBES.MESIN
+SET DEFINE OFF;
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000002','FC','2','0');
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000001','FC','3','1');
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000003','FC','2','0');
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000004','FC','2','0');
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000005','FC','2','0');
+Insert into TUBES.MESIN (ID_MESIN,TIPE_MESIN,KONDISI,STATUS_PEMINJAMAN) values ('FC00000006','FC','2','0');
+REM INSERTING into TUBES."mesin-dipinjam"
+SET DEFINE OFF;
+Insert into TUBES."mesin-dipinjam" (P_MESIN_ID_PEMINJAMAN,MESIN_ID_MESIN) values ('PM00000001','FC00000001');
+REM INSERTING into TUBES."p-buku"
+SET DEFINE OFF;
+Insert into TUBES."p-buku" (P_BUKU_ID_PEMINJAMAN,STOK_BUKU_ID_BUKU) values ('P000000001','00A0000001');
+Insert into TUBES."p-buku" (P_BUKU_ID_PEMINJAMAN,STOK_BUKU_ID_BUKU) values ('P000000002','00A0000002');
+Insert into TUBES."p-buku" (P_BUKU_ID_PEMINJAMAN,STOK_BUKU_ID_BUKU) values ('P000000004','00A0000003');
+Insert into TUBES."p-buku" (P_BUKU_ID_PEMINJAMAN,STOK_BUKU_ID_BUKU) values ('P000000005','00A0000008');
+REM INSERTING into TUBES.P_BUKU
+SET DEFINE OFF;
+Insert into TUBES.P_BUKU (ID_PEMINJAMAN,START_DATE,END_DATE,IS_OVERDUE,OVERDUE_DAYS,DENDA,LAYANAN_ID_LAYANAN) values ('P000000001',to_date('13-11-2022','DD-MM-RRRR'),to_date('18-11-2022','DD-MM-RRRR'),'1','9','45000','L000000001');
+Insert into TUBES.P_BUKU (ID_PEMINJAMAN,START_DATE,END_DATE,IS_OVERDUE,OVERDUE_DAYS,DENDA,LAYANAN_ID_LAYANAN) values ('P000000002',to_date('13-11-2022','DD-MM-RRRR'),to_date('18-11-2022','DD-MM-RRRR'),'1','9','45000','L000000002');
+Insert into TUBES.P_BUKU (ID_PEMINJAMAN,START_DATE,END_DATE,IS_OVERDUE,OVERDUE_DAYS,DENDA,LAYANAN_ID_LAYANAN) values ('P000000004',to_date('27-11-2022','DD-MM-RRRR'),to_date('02-12-2022','DD-MM-RRRR'),'0','0','0','L000000004');
+Insert into TUBES.P_BUKU (ID_PEMINJAMAN,START_DATE,END_DATE,IS_OVERDUE,OVERDUE_DAYS,DENDA,LAYANAN_ID_LAYANAN) values ('P000000005',to_date('27-11-2022','DD-MM-RRRR'),to_date('02-12-2022','DD-MM-RRRR'),'0','0','0','L000000007');
+REM INSERTING into TUBES.PELANGGAN
+SET DEFINE OFF;
+Insert into TUBES.PELANGGAN (ID_PELANGGAN,NIK,NAMA,JENIS_KELAMIN,TGL_LAHIR,MEMBERSHIP_KODE_MEMBER) values ('0000000001','abcdefghijkl0001','Raihan','L',to_date('13-11-2022','DD-MM-RRRR'),'G000000001');
+Insert into TUBES.PELANGGAN (ID_PELANGGAN,NIK,NAMA,JENIS_KELAMIN,TGL_LAHIR,MEMBERSHIP_KODE_MEMBER) values ('0000000002','abcdefghijkl0002','Hanri','L',to_date('13-11-2022','DD-MM-RRRR'),'G000000001');
+Insert into TUBES.PELANGGAN (ID_PELANGGAN,NIK,NAMA,JENIS_KELAMIN,TGL_LAHIR,MEMBERSHIP_KODE_MEMBER) values ('0000000003','abcdefghijkl0002','Zahri','L',to_date('14-11-2022','DD-MM-RRRR'),'B000000001');
+REM INSERTING into TUBES.PENULIS
+SET DEFINE OFF;
+Insert into TUBES.PENULIS (NAMA) values ('Junji Ito');
+Insert into TUBES.PENULIS (NAMA) values ('Akasaka Aka');
+REM INSERTING into TUBES."penulis-buku"
+SET DEFINE OFF;
+Insert into TUBES."penulis-buku" (BUKU_NAMA_BUKU,PENULIS_NAMA) values ('Kaguya-Sama Love is war','Akasaka Aka');
+REM INSERTING into TUBES.PERAWATAN
+SET DEFINE OFF;
+Insert into TUBES.PERAWATAN (MESIN_ID_MESIN,TEKNISI_ID_TEKNISI,START_DATE,END_DATE) values ('FC00000003','T000000001',to_timestamp('27-11-2022 13.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'),to_timestamp('27-11-2022 14.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'));
+Insert into TUBES.PERAWATAN (MESIN_ID_MESIN,TEKNISI_ID_TEKNISI,START_DATE,END_DATE) values ('FC00000004','T000000001',to_timestamp('27-11-2022 14.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'),to_timestamp('27-11-2022 15.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'));
+Insert into TUBES.PERAWATAN (MESIN_ID_MESIN,TEKNISI_ID_TEKNISI,START_DATE,END_DATE) values ('FC00000005','T000000001',to_timestamp('27-11-2022 15.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'),to_timestamp('27-11-2022 16.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'));
+Insert into TUBES.PERAWATAN (MESIN_ID_MESIN,TEKNISI_ID_TEKNISI,START_DATE,END_DATE) values ('FC00000006','T000000001',to_timestamp('27-11-2022 16.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'),to_timestamp('27-11-2022 17.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'));
+Insert into TUBES.PERAWATAN (MESIN_ID_MESIN,TEKNISI_ID_TEKNISI,START_DATE,END_DATE) values ('FC00000002','T000000001',to_timestamp('27-11-2022 12.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'),to_timestamp('27-11-2022 13.32.30,000000000','DD-MM-RRRR HH24.MI.SSXFF'));
+REM INSERTING into TUBES."plg-plg"
+SET DEFINE OFF;
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000001',to_date('13-11-2022','DD-MM-RRRR'));
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000002',to_date('27-11-2022','DD-MM-RRRR'));
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000003',to_date('21-11-2022','DD-MM-RRRR'));
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000001',to_date('27-11-2022','DD-MM-RRRR'));
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000002',to_date('27-11-2022','DD-MM-RRRR'));
+Insert into TUBES."plg-plg" (PUSTAKAWAN_ID_PUSTAKAWAN,PELANGGAN_ID_PELANGGAN,WAKTU_PELAYANAN) values ('ABCDE00001','0000000001',to_date('27-11-2022','DD-MM-RRRR'));
+REM INSERTING into TUBES.P_MESIN
+SET DEFINE OFF;
+Insert into TUBES.P_MESIN (ID_PEMINJAMAN,START_TIME,END_TIME,LAYANAN_ID_LAYANAN) values ('PM00000001',to_timestamp_tz('27-11-2022 11.43.03,057000000 ASIA/BANGKOK','DD-MM-RRRR HH24.MI.SSXFF TZR'),to_timestamp_tz('27-11-2022 12.43.03,000000000 ASIA/BANGKOK','DD-MM-RRRR HH24.MI.SSXFF TZR'),'L000000008');
+REM INSERTING into TUBES.PUSTAKAWAN
+SET DEFINE OFF;
+Insert into TUBES.PUSTAKAWAN (ID_PUSTAKAWAN,NAMA,TGL_LAHIR,STATUS) values ('ABCDE00001','Radit',to_date('13-11-2022','DD-MM-RRRR'),'1');
+REM INSERTING into TUBES.RAK
+SET DEFINE OFF;
+Insert into TUBES.RAK (ID_RAK,LOKASI) values ('FL001RK001','FL1');
+REM INSERTING into TUBES.STOK_BUKU
+SET DEFINE OFF;
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000001','A','FL001RK001','1','RK1B1 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000003','Uzumaki','FL001RK001','0','RK1B3 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000002','A','FL001RK001','1','RK1B2 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000004','Uzumaki','FL001RK001','0','RK1B4 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000005','Uzumaki','FL001RK001','0','RK1B4 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000006','Uzumaki','FL001RK001','0','RK1B4 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000007','Uzumaki','FL001RK001','0','RK1B4 ');
+Insert into TUBES.STOK_BUKU (ID_BUKU,BUKU_NAMA_BUKU,RAK_ID_RAK,STATUS_PEMINJAMAN,BARIS_RAK) values ('00A0000008','Kaguya-Sama Love is war','FL001RK001','1','RK1B2 ');
+REM INSERTING into TUBES.TEKNISI
+SET DEFINE OFF;
+Insert into TUBES.TEKNISI (ID_TEKNISI,NAMA,TGL_LAHIR,STATUS) values ('T000000001','Fikri',to_date('05-02-2003','DD-MM-RRRR'),'1');
+--------------------------------------------------------
+--  DDL for Index MEMBERSHIP_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."MEMBERSHIP_PK" ON "TUBES"."MEMBERSHIP" ("KODE_MEMBER") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index MESIN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."MESIN_PK" ON "TUBES"."MESIN" ("ID_MESIN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index PELANGGAN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."PELANGGAN_PK" ON "TUBES"."PELANGGAN" ("ID_PELANGGAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index P_BUKU__IDX
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."P_BUKU__IDX" ON "TUBES"."P_BUKU" ("LAYANAN_ID_LAYANAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index P_MESIN__IDX
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."P_MESIN__IDX" ON "TUBES"."P_MESIN" ("LAYANAN_ID_LAYANAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index TEKNISI_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."TEKNISI_PK" ON "TUBES"."TEKNISI" ("ID_TEKNISI") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index P_BUKU_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."P_BUKU_PK" ON "TUBES"."P_BUKU" ("ID_PEMINJAMAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index P_MESIN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."P_MESIN_PK" ON "TUBES"."P_MESIN" ("ID_PEMINJAMAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index PUSTAKAWAN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."PUSTAKAWAN_PK" ON "TUBES"."PUSTAKAWAN" ("ID_PUSTAKAWAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index BUKU_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."BUKU_PK" ON "TUBES"."BUKU" ("NAMA_BUKU") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index p-buku_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."p-buku_PK" ON "TUBES"."p-buku" ("P_BUKU_ID_PEMINJAMAN", "STOK_BUKU_ID_BUKU") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index LAYANAN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."LAYANAN_PK" ON "TUBES"."LAYANAN" ("ID_LAYANAN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index STOK_BUKU_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."STOK_BUKU_PK" ON "TUBES"."STOK_BUKU" ("ID_BUKU") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index PERAWATAN_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."PERAWATAN_PK" ON "TUBES"."PERAWATAN" ("MESIN_ID_MESIN", "TEKNISI_ID_TEKNISI") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index mesin-dipinjam_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."mesin-dipinjam_PK" ON "TUBES"."mesin-dipinjam" ("P_MESIN_ID_PEMINJAMAN", "MESIN_ID_MESIN") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Index RAK_PK
+--------------------------------------------------------
+
+  CREATE UNIQUE INDEX "TUBES"."RAK_PK" ON "TUBES"."RAK" ("ID_RAK") 
+  PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM" ;
+--------------------------------------------------------
+--  DDL for Trigger PELAYANPELANGGAN
+--------------------------------------------------------
+
+  CREATE OR REPLACE TRIGGER "TUBES"."PELAYANPELANGGAN" 
+    AFTER 
+    INSERT OR UPDATE 
+    ON layanan
+    for each row
+
+DECLARE
+
+BEGIN
+
+insert into "plg-plg"
+values((select id_pustakawan from pustakawan where status = 1),
+:new.pelanggan_ID_pelanggan,
+TO_DATE(sysdate));
+
+
+
+
+END;
+/
+ALTER TRIGGER "TUBES"."PELAYANPELANGGAN" ENABLE;
+--------------------------------------------------------
+--  DDL for Trigger UPDATE_MESIN
+--------------------------------------------------------
+
+  CREATE OR REPLACE TRIGGER "TUBES"."UPDATE_MESIN" 
+    AFTER 
+    INSERT OR UPDATE 
+    ON "mesin-dipinjam"
+    for each row
+
+DECLARE
+
+cari CHAR(10 CHAR) := :new.MESIN_ID_MESIN;
+
+BEGIN
+
+update MESIN
+set status_peminjaman = 1
+where ID_MESIN = cari;
+
+
+
+
+END;
+/
+ALTER TRIGGER "TUBES"."UPDATE_MESIN" ENABLE;
+--------------------------------------------------------
+--  DDL for Trigger UP_STOK
+--------------------------------------------------------
+
+  CREATE OR REPLACE TRIGGER "TUBES"."UP_STOK" 
+    AFTER 
+    INSERT OR UPDATE 
+    ON "p-buku"
+    for each row
+
+DECLARE
+
+cari CHAR(10 CHAR) := :new.STOK_BUKU_ID_BUKU;
+
+BEGIN
+
+update stok_buku
+set status_peminjaman = 1
+where id_buku = cari;
+
+
+
+
+END;
+/
+ALTER TRIGGER "TUBES"."UP_STOK" ENABLE;
+--------------------------------------------------------
+--  DDL for Procedure ADDBUKU
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."ADDBUKU" (nama in varchar2, genre in varchar2, jenis in varchar2, penulis1 in varchar2)
+
+IS
+
+status number;
+
+BEGIN
+status := AuthorCheck(penulis1);
+
+if (status = 1) then
+
+insert into buku
+values(nama,genre,jenis);
+
+insert into "penulis-buku"
+values(nama,(select * from penulis where nama = penulis1 and ROWNUM = 1));
+
+else 
+
+ADDPENULIS(penulis1);
+
+insert into buku
+values(nama,genre,jenis);
+
+insert into "penulis-buku"
+values(nama,(select * from penulis where nama = penulis1 and ROWNUM = 1));
+
+end if;
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure ADDPENULIS
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."ADDPENULIS" (nama in VARCHAR2)
+
+IS
+
+BEGIN
+
+insert into Penulis
+values(nama);
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure ADDSTOK
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."ADDSTOK" ( b_id in char, nama1 in varchar2, r_id in char, status in char, baris1 in char)
+
+IS
+
+BEGIN
+
+insert into stok_buku
+values(b_Id,(select nama_buku from buku where nama_buku = nama1),(select id_rak from rak where rak.id_rak = r_id),0,'RK1B2');
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure DENDACOUNT
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."DENDACOUNT" 
+
+IS
+
+BEGIN
+
+ update P_BUKU
+ set denda = overdue_days * 5000
+ where is_overdue = 1 and overdue_days >= 1;
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure OVERDUECHECK
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."OVERDUECHECK" 
+
+IS
+
+BEGIN
+
+ update P_BUKU
+ set is_overdue = 1
+ where end_date <= to_date(sysdate);
+
+ update P_buku
+ set overdue_days = to_date(sysdate) - end_date
+ where is_overdue = 1;
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure PINJAMBUKU
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."PINJAMBUKU" (ID_L in char, ID_P in char, ID_PP in char, NamaBuku in varchar2)
+
+IS
+
+BEGIN
+
+insert into layanan
+values(ID_L,(select id_pelanggan from pelanggan where id_pelanggan=ID_P),1);
+
+insert into P_BUKU
+values(id_pp,TO_DATE(sysdate),TO_DATE(sysdate + 5),0,0,0,id_l);
+
+insert into "p-buku"
+values((select id_peminjaman from P_Buku where id_peminjaman = id_pp),(select id_buku from stok_buku 
+where stok_buku.buku_nama_buku = namabuku and stok_buku.status_peminjaman < 1 and ROWNUM = 1));
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure PINJAMMESIN
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."PINJAMMESIN" (ID_L in char, ID_P in char, ID_PP in char, tipeM in varchar2)
+
+IS
+
+BEGIN
+
+insert into layanan
+values(ID_L,(select id_pelanggan from pelanggan where id_pelanggan=ID_P),2);
+
+insert into P_Mesin
+values(ID_PP,current_timestamp,current_timestamp + 1/24,ID_L);
+
+insert into "mesin-dipinjam"
+values((select id_peminjaman from P_Mesin where id_peminjaman = ID_PP),(select id_mesin from mesin 
+where mesin.tipe_mesin = tipeM and mesin.kondisi >= 2 and mesin.status_peminjaman = 0 and ROWNUM = 1));
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure REGISTRASI
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."REGISTRASI" ( 
+ID_P IN CHAR
+, NIK_P IN CHAR
+, NAMA_P IN  VARCHAR2
+, J_K IN CHAR
+, TL IN DATE
+, ALAMAT_P IN CLOB
+, MS IN int
+
+)
+IS
+
+BEGIN
+declare MS_D CHAR(10);
+
+BEGIN
+IF MS = 1 then
+    MS_D := 'G000000001';
+elsif MS = 2 then
+    MS_D := 'S000000001';
+else
+    MS_D := 'B000000001';
+    END IF;
+
+Insert into pelanggan (id_pelanggan,NIK,NAMA,JENIS_KELAMIN,TGL_LAHIR,ALAMAT,MEMBERSHIP_KODE_MEMBER)
+values (ID_P,NIK_P,NAMA_P,J_K,TL,ALAMAT_P,MS_D);
+
+exception
+ when others then
+    dbms_output.put_line( SQLERRM );
+END;
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure REPAIRCHECK
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."REPAIRCHECK" 
+
+IS
+    
+   interv number(2);
+   CURSOR mesin2 
+   is 
+      SELECT * FROM mesin; 
+
+BEGIN 
+    interv := 0;
+
+   FOR mesin_rec in mesin2
+   LOOP
+    if(mesin_rec.kondisi < 2) then
+    insert into perawatan
+    values(mesin_rec.id_mesin,(select teknisi.id_teknisi from teknisi where status = 1 and rownum = 1),
+    current_timestamp + (interv/24), ((current_timestamp + (interv/24)) + 1/24));
+
+    update mesin
+    set mesin.kondisi = 2
+    where mesin.id_mesin = mesin_rec.id_mesin;
+
+    interv := interv + 1;
+    END IF;
+
+   END LOOP;
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Procedure RETURNBOOK
+--------------------------------------------------------
+set define off;
+
+  CREATE OR REPLACE PROCEDURE "TUBES"."RETURNBOOK" (Book_ID in Char)
+
+IS
+
+BEGIN
+update stok_buku
+set status_peminjaman = 0
+where id_buku = book_id;
+
+
+EXCEPTION
+WHEN OTHERS THEN
+   raise_application_error(-20001,'An error was encountered - '||SQLCODE||' -ERROR- '||SQLERRM);
+END;
+
+/
+--------------------------------------------------------
+--  DDL for Function AUTHORCHECK
+--------------------------------------------------------
+
+  CREATE OR REPLACE FUNCTION "TUBES"."AUTHORCHECK" (nama1 in varchar2)
+RETURN NUMBER
+AS
+ status number;
+BEGIN
+  select count(*)
+    into status
+    from penulis
+    where nama = nama1;
+
+  if status > 0 then
+    return 1;
+  else 
+    return 0; 
+  end if;
+
+END AuthorCheck;
+
+/
+--------------------------------------------------------
+--  Constraints for Table PELANGGAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PELANGGAN" ADD CONSTRAINT "PELANGGAN_PK" PRIMARY KEY ("ID_PELANGGAN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("MEMBERSHIP_KODE_MEMBER" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("ALAMAT" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("TGL_LAHIR" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("JENIS_KELAMIN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("NAMA" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("NIK" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PELANGGAN" MODIFY ("ID_PELANGGAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table STOK_BUKU
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CHECK ( ( rak_id_rak IS NULL
+                  AND baris_rak IS NULL )
+                OR ( rak_id_rak IS NOT NULL
+                     AND baris_rak IS NOT NULL ) ) ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CHECK ( ( rak_id_rak IS NULL
+                  AND baris_rak IS NULL )
+                OR ( rak_id_rak IS NOT NULL
+                     AND baris_rak IS NOT NULL ) ) ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CHECK ( ( rak_id_rak IS NULL
+                  AND baris_rak IS NULL )
+                OR ( rak_id_rak IS NOT NULL
+                     AND baris_rak IS NOT NULL ) ) ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CHECK ( ( rak_id_rak IS NULL
+                  AND baris_rak IS NULL )
+                OR ( rak_id_rak IS NOT NULL
+                     AND baris_rak IS NOT NULL ) ) ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CONSTRAINT "STOK_BUKU_PK" PRIMARY KEY ("ID_BUKU")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CHECK ( ( rak_id_rak IS NULL
+                  AND baris_rak IS NULL )
+                OR ( rak_id_rak IS NOT NULL
+                     AND baris_rak IS NOT NULL ) ) ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" MODIFY ("STATUS_PEMINJAMAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."STOK_BUKU" MODIFY ("BUKU_NAMA_BUKU" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."STOK_BUKU" MODIFY ("ID_BUKU" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table plg-plg
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."plg-plg" MODIFY ("WAKTU_PELAYANAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."plg-plg" MODIFY ("PELANGGAN_ID_PELANGGAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."plg-plg" MODIFY ("PUSTAKAWAN_ID_PUSTAKAWAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table PENULIS
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PENULIS" MODIFY ("NAMA" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table mesin-dipinjam
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."mesin-dipinjam" ADD CONSTRAINT "mesin-dipinjam_PK" PRIMARY KEY ("P_MESIN_ID_PEMINJAMAN", "MESIN_ID_MESIN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."mesin-dipinjam" MODIFY ("MESIN_ID_MESIN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."mesin-dipinjam" MODIFY ("P_MESIN_ID_PEMINJAMAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table P_BUKU
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."P_BUKU" ADD CONSTRAINT "P_BUKU_PK" PRIMARY KEY ("ID_PEMINJAMAN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."P_BUKU" MODIFY ("LAYANAN_ID_LAYANAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_BUKU" MODIFY ("END_DATE" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_BUKU" MODIFY ("START_DATE" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_BUKU" MODIFY ("ID_PEMINJAMAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table P_MESIN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."P_MESIN" ADD CONSTRAINT "P_MESIN_PK" PRIMARY KEY ("ID_PEMINJAMAN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."P_MESIN" MODIFY ("LAYANAN_ID_LAYANAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_MESIN" MODIFY ("END_TIME" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_MESIN" MODIFY ("START_TIME" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."P_MESIN" MODIFY ("ID_PEMINJAMAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table RAK
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."RAK" ADD CONSTRAINT "RAK_PK" PRIMARY KEY ("ID_RAK")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."RAK" MODIFY ("LOKASI" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."RAK" MODIFY ("ID_RAK" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table p-buku
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."p-buku" ADD CONSTRAINT "p-buku_PK" PRIMARY KEY ("P_BUKU_ID_PEMINJAMAN", "STOK_BUKU_ID_BUKU")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."p-buku" MODIFY ("STOK_BUKU_ID_BUKU" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."p-buku" MODIFY ("P_BUKU_ID_PEMINJAMAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table PUSTAKAWAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PUSTAKAWAN" ADD CONSTRAINT "PUSTAKAWAN_PK" PRIMARY KEY ("ID_PUSTAKAWAN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."PUSTAKAWAN" MODIFY ("ALAMAT" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PUSTAKAWAN" MODIFY ("TGL_LAHIR" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PUSTAKAWAN" MODIFY ("NAMA" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PUSTAKAWAN" MODIFY ("ID_PUSTAKAWAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table LAYANAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."LAYANAN" ADD CONSTRAINT "LAYANAN_PK" PRIMARY KEY ("ID_LAYANAN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."LAYANAN" MODIFY ("PELANGGAN_ID_PELANGGAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."LAYANAN" MODIFY ("ID_LAYANAN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table TEKNISI
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."TEKNISI" MODIFY ("STATUS" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."TEKNISI" ADD CONSTRAINT "TEKNISI_PK" PRIMARY KEY ("ID_TEKNISI")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."TEKNISI" MODIFY ("ALAMAT" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."TEKNISI" MODIFY ("TGL_LAHIR" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."TEKNISI" MODIFY ("NAMA" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."TEKNISI" MODIFY ("ID_TEKNISI" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table MESIN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."MESIN" MODIFY ("STATUS_PEMINJAMAN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."MESIN" ADD CONSTRAINT "MESIN_PK" PRIMARY KEY ("ID_MESIN")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."MESIN" MODIFY ("KONDISI" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."MESIN" MODIFY ("TIPE_MESIN" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."MESIN" MODIFY ("ID_MESIN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table MEMBERSHIP
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."MEMBERSHIP" ADD CONSTRAINT "MEMBERSHIP_PK" PRIMARY KEY ("KODE_MEMBER")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."MEMBERSHIP" MODIFY ("HARGA" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."MEMBERSHIP" MODIFY ("TIPE_MEMBER" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."MEMBERSHIP" MODIFY ("KODE_MEMBER" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table PERAWATAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PERAWATAN" MODIFY ("END_DATE" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PERAWATAN" ADD CONSTRAINT "PERAWATAN_PK" PRIMARY KEY ("MESIN_ID_MESIN", "TEKNISI_ID_TEKNISI")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."PERAWATAN" MODIFY ("START_DATE" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PERAWATAN" MODIFY ("TEKNISI_ID_TEKNISI" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."PERAWATAN" MODIFY ("MESIN_ID_MESIN" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table BUKU
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."BUKU" ADD CONSTRAINT "BUKU_PK" PRIMARY KEY ("NAMA_BUKU")
+  USING INDEX PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
+  STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
+  PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1 BUFFER_POOL DEFAULT FLASH_CACHE DEFAULT CELL_FLASH_CACHE DEFAULT)
+  TABLESPACE "SYSTEM"  ENABLE;
+  ALTER TABLE "TUBES"."BUKU" MODIFY ("JENIS_BUKU" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."BUKU" MODIFY ("GENRE_BUKU" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."BUKU" MODIFY ("NAMA_BUKU" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Constraints for Table penulis-buku
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."penulis-buku" MODIFY ("PENULIS_NAMA" NOT NULL ENABLE);
+  ALTER TABLE "TUBES"."penulis-buku" MODIFY ("BUKU_NAMA_BUKU" NOT NULL ENABLE);
+--------------------------------------------------------
+--  Ref Constraints for Table LAYANAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."LAYANAN" ADD CONSTRAINT "LAYANAN_PELANGGAN_FK" FOREIGN KEY ("PELANGGAN_ID_PELANGGAN")
+	  REFERENCES "TUBES"."PELANGGAN" ("ID_PELANGGAN") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table mesin-dipinjam
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."mesin-dipinjam" ADD CONSTRAINT "mesin-dipinjam_Mesin_FK" FOREIGN KEY ("MESIN_ID_MESIN")
+	  REFERENCES "TUBES"."MESIN" ("ID_MESIN") ENABLE;
+  ALTER TABLE "TUBES"."mesin-dipinjam" ADD CONSTRAINT "mesin-dipinjam_p_mesin_FK" FOREIGN KEY ("P_MESIN_ID_PEMINJAMAN")
+	  REFERENCES "TUBES"."P_MESIN" ("ID_PEMINJAMAN") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table p-buku
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."p-buku" ADD CONSTRAINT "p-buku_p_buku_FK" FOREIGN KEY ("P_BUKU_ID_PEMINJAMAN")
+	  REFERENCES "TUBES"."P_BUKU" ("ID_PEMINJAMAN") ENABLE;
+  ALTER TABLE "TUBES"."p-buku" ADD CONSTRAINT "p-buku_stok_buku_FK" FOREIGN KEY ("STOK_BUKU_ID_BUKU")
+	  REFERENCES "TUBES"."STOK_BUKU" ("ID_BUKU") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table P_BUKU
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."P_BUKU" ADD CONSTRAINT "P_BUKU_LAYANAN_FK" FOREIGN KEY ("LAYANAN_ID_LAYANAN")
+	  REFERENCES "TUBES"."LAYANAN" ("ID_LAYANAN") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table PELANGGAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PELANGGAN" ADD CONSTRAINT "PELANGGAN_MEMBERSHIP_FK" FOREIGN KEY ("MEMBERSHIP_KODE_MEMBER")
+	  REFERENCES "TUBES"."MEMBERSHIP" ("KODE_MEMBER") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table penulis-buku
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."penulis-buku" ADD CONSTRAINT "penulis-buku_Buku_FK" FOREIGN KEY ("BUKU_NAMA_BUKU")
+	  REFERENCES "TUBES"."BUKU" ("NAMA_BUKU") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table PERAWATAN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."PERAWATAN" ADD CONSTRAINT "PERAWATAN_MESIN_FK" FOREIGN KEY ("MESIN_ID_MESIN")
+	  REFERENCES "TUBES"."MESIN" ("ID_MESIN") ENABLE;
+  ALTER TABLE "TUBES"."PERAWATAN" ADD CONSTRAINT "PERAWATAN_TEKNISI_FK" FOREIGN KEY ("TEKNISI_ID_TEKNISI")
+	  REFERENCES "TUBES"."TEKNISI" ("ID_TEKNISI") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table plg-plg
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."plg-plg" ADD CONSTRAINT "plg-plg_Pelanggan_FK" FOREIGN KEY ("PELANGGAN_ID_PELANGGAN")
+	  REFERENCES "TUBES"."PELANGGAN" ("ID_PELANGGAN") ENABLE;
+  ALTER TABLE "TUBES"."plg-plg" ADD CONSTRAINT "plg-plg_Pustakawan_FK" FOREIGN KEY ("PUSTAKAWAN_ID_PUSTAKAWAN")
+	  REFERENCES "TUBES"."PUSTAKAWAN" ("ID_PUSTAKAWAN") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table P_MESIN
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."P_MESIN" ADD CONSTRAINT "P_MESIN_LAYANAN_FK" FOREIGN KEY ("LAYANAN_ID_LAYANAN")
+	  REFERENCES "TUBES"."LAYANAN" ("ID_LAYANAN") ENABLE;
+--------------------------------------------------------
+--  Ref Constraints for Table STOK_BUKU
+--------------------------------------------------------
+
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CONSTRAINT "STOK_BUKU_BUKU_FK" FOREIGN KEY ("BUKU_NAMA_BUKU")
+	  REFERENCES "TUBES"."BUKU" ("NAMA_BUKU") ENABLE;
+  ALTER TABLE "TUBES"."STOK_BUKU" ADD CONSTRAINT "STOK_BUKU_RAK_FK" FOREIGN KEY ("RAK_ID_RAK")
+	  REFERENCES "TUBES"."RAK" ("ID_RAK") ENABLE;

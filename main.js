@@ -6,10 +6,12 @@ const express = require('express');
 const app = express();
 let status_login = false;
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.fetchAsString = [ oracledb.CLOB ];
 let result = [{
   NAMA_BUKU: '',
   GENRE_BUKU: '',
-  JENIS_BUKU: ''
+  JENIS_BUKU: '',
+  DESKRIPSI: ''
 }];
 let connection;
 let bodyParser = require('body-parser');
@@ -89,7 +91,7 @@ async function connectDb() {
 }
 
 async function renderData(){
-    sql = `SELECT nama_buku,genre_buku,jenis_buku FROM buku`;
+    sql = `SELECT nama_buku,genre_buku,jenis_buku,deskripsi FROM buku`;
     binds = {};
     let temp = await getData(sql,binds);
     return temp;
