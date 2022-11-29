@@ -7,16 +7,7 @@ const app = express();
 let status_login = false;
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 oracledb.fetchAsString = [oracledb.CLOB];
-let buku = [{
-  NAMA_BUKU: '',
-  GENRE_BUKU: '',
-  JENIS_BUKU: '',
-  DESKRIPSI: ''
-}];
-let mesin, pegawai;
-let author = [{
-  NAMA: ''
-}];
+let buku,mesin, pegawai, author,member;
 let connection;
 let bodyParser = require('body-parser');
 const configApp = () => {
@@ -76,11 +67,10 @@ const setGet = () => {
 }
 
 const setPost = () => {
-  app.post("/post_buku", (req, res) => {
-    console.log(req.body);
+  app.post("/post_buku", async (req, res) => {
     sql = `insert into buku(nama_buku,genre_buku,jenis_buku) values(:1,:2,:3)`;
     binding = [[req.body.nama_buku, req.body.genre_buku, req.body.jenis_buku]];
-    post_status = getData(sql, binding);
+    post_status = await getData(sql, binding);
     sql = 'insert into "penulis-buku"(buku_nama_buku,penulis_nama) values(:1,:2)';
     binding = [];
     if(Array.isArray(req.body.author_buku)){
@@ -102,21 +92,28 @@ const setPost = () => {
       res.redirect("/");
     }
   });
-  app.post("/tambah-author", (req, res) => {
+  app.post("/tambah-author", async (req, res) => {
     console.log(req.body.nama_author);
     let sql = `insert into penulis(nama) values(:1)`;
     let binds = [req.body.nama_author];
     console.log(binds);
-    let temp = getData(sql, binds, "author");
+    await getData(sql, binds, "author");
     res.redirect("/add_author");
   });
   app.post("/register", async (req, res) => {
     let row = await getRow();
     console.log(row);
-      let digit = 10-row.length;
-      let id = "0".repeat(digit) + row.toString();
-      console.log(id);
-      res.redirect("/registrasi");
+    let digit = 10-row.length;
+    row = parseInt(row) + 1;
+    let id = "0".repeat(digit) + row.toString();
+    console.log(req.body.NIK);
+    console.log(id);
+    sql = `BEGIN
+          registrasi('${id}','${req.body.NIK}','${req.body.nama_plg}','${req.body.kelamin}',
+                      TO_DATE('${req.body.tgl_lahir}','DD-MM-YYYY'),'${req.body.alamat}','${req.body.membership}');
+          END;`;
+    let temp = await insertData(sql,[]);
+    res.redirect("/registrasi");
   });
 }
 
@@ -153,7 +150,6 @@ async function renderPegawai() {
   return getData(sql, binds, "pegawai");
 }
 async function getData(sql, binds, type) {
-  let temp;
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
     autoCommit: true,
@@ -173,22 +169,53 @@ async function getData(sql, binds, type) {
       while ((row = await tempResult.getRow())) {
         rows.push(row);
       }
-      if (type == "buku") {
-        buku = JSON.parse(JSON.stringify(rows));;
-      }
-      else if (type == "author") {
-        author = JSON.parse(JSON.stringify(rows));
-      }
-      else if (type == "mesin") {
-        mesin = JSON.parse(JSON.stringify(rows));
-      }
-      else if (type == "pegawai") {
-        pegawai = JSON.parse(JSON.stringify(rows));
+      switch(type){
+        case "buku"     : buku    = JSON.parse(JSON.stringify(rows));break;
+        case "author"   : author  = JSON.parse(JSON.stringify(rows));break;
+        case "mesin"    : mesin   = JSON.parse(JSON.stringify(rows));break;
+        case "pegawai"  : pegawai = JSON.parse(JSON.stringify(rows));break;
+        case "member"   : member  = JSON.parse(JSON.stringify(rows));break;
+        default  : ;
       }
       await tempResult.close();
     }
     else {
       const tempQuery = await connection.executeMany(sql, binds, options);
+    }
+    console.log(rows);
+    return true;
+  }
+  catch (err) {
+    return false;
+  }
+}
+async function insertData(sql, binds) {
+  options = {
+    outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
+    autoCommit: true,
+    resultSet: true
+    // extendedMetaData: true,               // get extra metadata
+    // prefetchRows:     100,                // internal buffer allocation size for tuning
+    // fetchArraySize:   100                 // internal buffer allocation size for tuning
+  };
+  try {
+    // For a complete list of options see the documentation.
+    if (binds.length <= 1) {
+      if(binds.length == 1){binds = binds[0];}
+      const rows = await connection.execute(sql, binds, options);
+
+      switch(type){
+        case "buku"     : buku    = JSON.parse(JSON.stringify(rows));break;
+        case "author"   : author  = JSON.parse(JSON.stringify(rows));break;
+        case "mesin"    : mesin   = JSON.parse(JSON.stringify(rows));break;
+        case "pegawai"  : pegawai = JSON.parse(JSON.stringify(rows));break;
+        case "member"   : member  = JSON.parse(JSON.stringify(rows));break;
+        default  : ;
+      }
+      await tempResult.close();
+    }
+    else {
+      const rows = await connection.executeMany(sql, binds, options);
     }
     console.log(rows);
     return true;
@@ -211,7 +238,7 @@ async function getRow() {
   try {
     temp = await connection.execute(sql)
       // For a complete list of options see the documentation.
-    return JSON.parse(JSON.stringify(temp))["rows"][0].TOTAL; 
+    return JSON.parse(JSON.stringify(temp))["rows"][0].TOTAL.toString(); 
   }
   catch (err) {
     return 0;

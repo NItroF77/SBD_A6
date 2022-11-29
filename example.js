@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, 2022, Oracle and/or its affiliates. */
+/* Copyright (c) 2018, 2022, Oracle and/or its affiliates. */
 
 /******************************************************************************
  *
@@ -16,21 +16,25 @@
  * limitations under the License.
  *
  * NAME
- *   resultset1.js
+ *   example.js
  *
  * DESCRIPTION
- *   Executes a query and uses a ResultSet to fetch rows with getRow().
+ *   A basic node-oracledb example using Node.js 8's async/await syntax.
  *
- *   This example requires node-oracledb 2.0.15 or later.
+ *   For connection pool examples see connectionpool.js and webapp.js
+ *   For a ResultSet example see resultset1.js
+ *   For a query stream example see selectstream.js
  *
- *   This example uses Node 8's async/await syntax.
+ *   This example requires node-oracledb 5 or later.
  *
  *****************************************************************************/
+
+// Using a fixed Oracle time zone helps avoid machine and deployment differences
+process.env.ORA_SDTZ = 'UTC';
 
 const fs = require('fs');
 const oracledb = require('oracledb');
 const dbConfig = require('./dbconfig.js');
-const demoSetup = require('./demosetup.js');
 
 // On Windows and macOS, you can specify the directory containing the Oracle
 // Client Libraries at runtime, or before Node.js starts.  On other platforms
@@ -51,34 +55,24 @@ async function run() {
   let connection;
 
   try {
+
+    let sql, binds, options, result;
+
     connection = await oracledb.getConnection(dbConfig);
+    sql = `BEGIN
+     REGISTRASI('0000000006','1234567891234567','WOW','L',TO_DATE('11-11-2012','DD-MM-YYYY'),'disini','1');
+     END;`;
 
-    await demoSetup.setupBf(connection);  // create the demo table
+    binds = [];
 
-    const result = await connection.execute(
-      `SELECT id, farmer
-       FROM no_banana_farmer
-       ORDER BY id`,
-      [], // no bind variables
-      {
-        resultSet: true,             // return a ResultSet (default is false)
-        // prefetchRows:   100,      // internal buffer allocation size for tuning
-        // fetchArraySize: 100       // internal buffer allocation size for tuning
-      }
-    );
+    // For a complete list of options see the documentation.
+    options = {
+      autoCommit: true,
+      // batchErrors: true,  // continue processing even if there are data errors
+    };
 
-    const rs = result.resultSet;
-    let row;
-    let i = 1;
-
-    while ((row = await rs.getRow())) {
-      console.log("getRow(): row " + i++);
-      console.log(row);
-    }
-
-    // always close the ResultSet
-    await rs.close();
-
+    result = await connection.execute(sql, binds, options);
+    await connection.commit();
   } catch (err) {
     console.error(err);
   } finally {
