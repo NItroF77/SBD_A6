@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <title>tes</title>
+    <h1><%= title %></h1>
+</head>
+<body>
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nama Author</th>
+          </tr>
+        </thead>
+        <tbody>
+            <%let i = 1;%>
+            <%for(let author of listAuthor){%>
+          <tr>
+            <th scope="row"><%=i++%></th>
+            <td><%=author.NAMA%></td>
+          </tr>
+            <%}%>
+        </tbody>
+      </table>
+    <div class="mb-3">
+        <form class ="form-inline" action="/tambah-author" method="post" style="width:50%;float:left;">
+            <div>
+                <label for="nama_author" class="form-label">Nama Author</label>
+            <input type="text" class="form-control" name="nama_author" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Tambahkan Author</button>
+        </form>
+    </div>
+
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            let str = `<div>
+                <input type="text" class="form-control" name="author_buku" placeholder="" required>
+                </div>`;
+            $("#tambahAuthor").html(str);
+            $('#btnAdd').click(function() {
+                $('#author-form').append(str);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -6,19 +6,24 @@ const express = require('express');
 const app = express();
 let status_login = false;
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.fetchAsString = [ oracledb.CLOB ];
-let result = [{
+oracledb.fetchAsString = [oracledb.CLOB];
+let buku = [{
   NAMA_BUKU: '',
   GENRE_BUKU: '',
   JENIS_BUKU: '',
   DESKRIPSI: ''
 }];
+let mesin, pegawai;
+let author = [{
+  NAMA: ''
+}];
 let connection;
 let bodyParser = require('body-parser');
-const configApp = () =>{
+const configApp = () => {
   app.use(bodyParser.json());       // to support JSON-encoded bodies
   app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true}
+    extended: true
+  }
   ));
   app.use('/assets', [
     express.static(__dirname + '/node_modules/jquery/dist/'),
@@ -31,7 +36,7 @@ const configApp = () =>{
   app.use('/elements', [
     express.static(__dirname + '/elements')
   ]);
-  app.use('/style',[
+  app.use('/style', [
     express.static(__dirname + '/views/style')
   ]);
   app.listen(1522, () => {
@@ -41,24 +46,55 @@ const configApp = () =>{
   app.set("views", "views");
 }
 
-const setGet = () =>{
-  app.get("/", (req, res) => {
+const setGet = () => {
+  app.get("/", async (req, res) => {
     let data_status;
-      data_status = renderData();
-      let datas = JSON.parse(JSON.stringify(result));
-      console.log(datas);
-        if(data_status){
-          res.render("index", { datas: datas, title: "OracleDb Simulation" });
-          return true;
-         }
-         else{
-          res.render("index", {title: "Error" });
-          return false;
-         }
+    data_status = await renderBuku();
+    if (data_status) {
+      res.render("index", { listBuku: buku, title: "OracleDb Simulation" });
+      return true;
+    }
+    else {
+      res.render("index", { title: "Error" });
+      return false;
+    }
   });
 
-  app.get("/add_buku", (req, res) => {
-    res.render("add_buku", { title: "Penambahan Buku" });
+  app.get("/add_buku", async (req, res) => {
+    await renderAuthor();
+    res.render("add_buku", { title: "Penambahan Buku", listAuthor : author});
+  });
+
+  app.get("/add_author", async (req, res) => {
+    await renderAuthor();
+    res.render("add_author", { title: "Penambahan Author", listAuthor: author });
+  });
+
+  app.get("/registrasi", (req, res) => {
+    res.render("add_membership", { title: "Penambahan Membership"});
+  });
+}
+
+const setPost = () => {
+  app.post("/post_buku", (req, res) => {
+    console.log(req.body);
+    sql = `insert into buku(nama_buku,genre_buku,jenis_buku) values(:1,:2,:3)`;
+    binding = [[req.body.nama_buku, req.body.genre_buku, req.body.jenis_buku]];
+    post_status = getData(sql, binding);
+    sql = 'insert into "penulis-buku"(buku_nama_buku,penulis_nama) values(:1,:2)';
+    binding = [];
+    if(Array.isArray(req.body.author_buku)){
+      for(authors of req.body.author_buku){
+        binding.push([req.body.nama_buku,authors]);
+      }
+    }
+    else{
+      binding.push([req.body.nama_buku,req.body.author_buku]);
+    }
+    console.log(binding);
+    post_status = getData(sql, binding);
+    console.log(post_status);
+    res.redirect("/");
   });
   app.post("/login-user", (req, res) => {
     if (connectDb(req.body.username, req.body.password)) {
@@ -66,23 +102,29 @@ const setGet = () =>{
       res.redirect("/");
     }
   });
-}
-
-const setPost = () =>{
-  app.post("/post_buku", (req, res) => {
-    sql = `insert into buku(nama_buku,genre_buku,jenis_buku) values(:1,:2,:3)`;
-    binding = [req.body.nama_buku,req.body.genre_buku,req.body.jenis_buku];
-    post_status = getData(sql,binding);
-    console.log(post_status);
-    res.redirect("/");
-});
+  app.post("/tambah-author", (req, res) => {
+    console.log(req.body.nama_author);
+    let sql = `insert into penulis(nama) values(:1)`;
+    let binds = [req.body.nama_author];
+    console.log(binds);
+    let temp = getData(sql, binds, "author");
+    res.redirect("/add_author");
+  });
+  app.post("/register", async (req, res) => {
+    let row = await getRow();
+    console.log(row);
+      let digit = 10-row.length;
+      let id = "0".repeat(digit) + row.toString();
+      console.log(id);
+      res.redirect("/registrasi");
+  });
 }
 
 async function connectDb() {
   try {
     connection = await oracledb.getConnection({
-      user: "A6",
-      password: "A6",
+      user: "TUBES",
+      password: "TUBES",
       connectString: "localhost/xe"
     });
   } catch (err) {
@@ -90,42 +132,97 @@ async function connectDb() {
   }
 }
 
-async function renderData(){
-    sql = `SELECT nama_buku,genre_buku,jenis_buku,deskripsi FROM buku`;
-    binds = {};
-    let temp = await getData(sql,binds);
-    return temp;
+async function renderBuku() {
+  sql = `SELECT nama_buku,genre_buku,jenis_buku,deskripsi FROM buku`;
+  binds = [];
+  return getData(sql, binds, "buku");
 }
-async function getData(sql,binds){
+async function renderAuthor() {
+  sql = `SELECT NAMA FROM PENULIS`;
+  binds = [];
+  return getData(sql, binds, "author");
+}
+async function renderMesin() {
+  sql = `SELECT id_mesin,tipe_mesin,kondisi,status_peminjaman FROM mesin`;
+  binds = [];
+  return  getData(sql, binds, "mesin");
+}
+async function renderPegawai() {
+  sql = `SELECT id_pustakawan,nama,status FROM pustakawan`;
+  binds = [];
+  return getData(sql, binds, "pegawai");
+}
+async function getData(sql, binds, type) {
+  let temp;
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
-    autoCommit : true,
-    resultSet : true
+    autoCommit: true,
+    resultSet: true
     // extendedMetaData: true,               // get extra metadata
     // prefetchRows:     100,                // internal buffer allocation size for tuning
     // fetchArraySize:   100                 // internal buffer allocation size for tuning
-  };  
-  try{
-      // For a complete list of options see the documentation.
+  };
+  try {
+    // For a complete list of options see the documentation.
     let row;
     let rows = [];
-    const tempQuery = await connection.execute(sql, binds, options);
-    const tempResult = tempQuery.resultSet;
-    while ((row = await tempResult.getRow())){
-      rows.push(row);
-      result = rows;
+    if (binds.length <= 1) {
+      if(binds.length == 1){binds = binds[0];}
+      const tempQuery = await connection.execute(sql, binds, options);
+      const tempResult = tempQuery.resultSet;
+      while ((row = await tempResult.getRow())) {
+        rows.push(row);
+      }
+      if (type == "buku") {
+        buku = JSON.parse(JSON.stringify(rows));;
+      }
+      else if (type == "author") {
+        author = JSON.parse(JSON.stringify(rows));
+      }
+      else if (type == "mesin") {
+        mesin = JSON.parse(JSON.stringify(rows));
+      }
+      else if (type == "pegawai") {
+        pegawai = JSON.parse(JSON.stringify(rows));
+      }
+      await tempResult.close();
     }
-    await tempResult.close();
+    else {
+      const tempQuery = await connection.executeMany(sql, binds, options);
+    }
+    console.log(rows);
     return true;
-    }
-  catch(err){
+  }
+  catch (err) {
     return false;
   }
 }
-
-function run (){
+async function getRow() {
+  let sql = "select count(*) as total from pelanggan";
+  let temp;
+  options = {
+    outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
+    autoCommit: true,
+    resultSet: true
+    // extendedMetaData: true,               // get extra metadata
+    // prefetchRows:     100,                // internal buffer allocation size for tuning
+    // fetchArraySize:   100                 // internal buffer allocation size for tuning
+  };
+  try {
+    temp = await connection.execute(sql)
+      // For a complete list of options see the documentation.
+    return JSON.parse(JSON.stringify(temp))["rows"][0].TOTAL; 
+  }
+  catch (err) {
+    return 0;
+  }
+}
+function run() {
   connectDb();
-  renderData();
+  renderBuku();
+  renderAuthor();
+  renderMesin();
+  renderPegawai();
   configApp();
   setGet();
   setPost();

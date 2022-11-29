@@ -1,26 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
     <title>tes</title>
-    <h1><%= title %></h1>
+    <h1>
+        <%= title %>
+    </h1>
+</head>
+
+<body>
     <div class="mb-3">
-        <form action="/post_buku" method="post">
-            <label for="nama_buku" class="form-label">Judul Buku</label>
-            <input type="text" class="form-control" name="nama_buku" placeholder="Harry Potter" required>
-            <label for="jenis_buku" class="form-label">Jenis Buku</label>
-            <input type="text" class="form-control" name="jenis_buku" placeholder="Novel" required>
-            <label for="genre_buku" class="form-label">Genre Buku</label>
-            <input type="text" class="form-control" name="genre_buku" placeholder="Fantasi" required>
-            <button type="submit" class="btn btn-primary">Tambahkan Buku</button>
+        <form class="form-inline" action="/post_buku" method="post" style="width:50%;float:left;">
+            <div class="input">
+                <label for="nama_buku" class="form-label">Judul Buku</label>
+                <input type="text" class="form-control" name="nama_buku" placeholder="Harry Potter" required>
+            </div>
+            <div class="input" id="list-jenis"></div>
+            <div class="input" id="list-genre"></div>
+            <div class="input" id="list-author">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="author_buku">Author</label>
+                    </div>
+                    <select class="custom-select" name="author_buku" id="author_buku">
+                        <option selected></option>
+                        <%for(author of listAuthor){%>
+                        <option value="<%=author.NAMA%>"><%= author.NAMA %></option>
+                        <%}%>
+                    </select>
+                </div>
+            </div>
+            <div class="input-button">
+                <button id="btnAdd" type="button" class="btn btn-light btn-sm input">Tambah Author</button>
+            </div>
+            <button type="submit" class="btn btn-primary input">Tambahkan Buku</button>
         </form>
     </div>
-</head>
-<body>
-    
+
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            $("#list-genre").load("elements/genreBuku.html");
+            $("#list-jenis").load("elements/jenisBuku.html");
+            $(".dropdown-toggle").dropdown();
+            $('#btnAdd').click(function () {
+                $("#list-author").clone().prepend("#input-button");
+            });
+        });
+    </script>
 </body>
+
 </html>

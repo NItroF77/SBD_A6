@@ -58,3 +58,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
 }
+.input{
+    margin: 5px;
+    overflow: visible;
+}

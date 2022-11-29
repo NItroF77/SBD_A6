@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <title>tes</title>
+    <h1>
+        <%= title %>
+    </h1>
+</head>
+
+<body>
+    <div class="mb-3">
+        <form class="form-inline" action="/register" method="post" style="width:50%;float:left;">
+            <div class="input">
+                <label for="nama_plg" class="form-label">Nama</label>
+                <input type="text" class="form-control" name="nama_plg" placeholder="Harry Potter" required>
+            </div>
+            <div class="input">
+                <label for="NIK" class="form-label">NIK</label>
+                <input type="text" class="form-control" name="NIK" placeholder="12-digit" required>
+            </div>
+            <div id="list-kelamin"></div>
+            <div class="input">
+                <label for="tgl-lahir" class="form-label">Tanggal Lahir</label>
+                <input type="text" class="form-control" name="tgl-lahir" placeholder="dd-mm-yyyy" required>
+            </div>
+            <div class="input">
+                <label for="alamat" class="form-label">Alamat</label>
+                <input type="text" class="form-control" name="alamat" placeholder="Hell no 14" required>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="membership">Membership</label>
+                </div>
+                <select class="custom-select" name="membership" id="membership" required>
+                    <option selected></option>
+                    <option value="1">Gold</option>
+                    <option value="2">Silver</option>
+                    <option value="3">Bronze</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary input">Tambahkan Buku</button>
+        </form>
+    </div>
+
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            $("#list-kelamin").load("/elements/jenisKelamin.html");
+        });
+    </script>
+</body>
+
+</html>
