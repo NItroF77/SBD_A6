@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <title>tes</title>
+    <h1>
+        <%= title %>
+    </h1>
+</head>
+
+<body>
+    <form class="form-inline" action="/add_stok" method="post" style="width:50%;float:left;">
+        <div class="input">
+            <label for="stok_id" class="form-label">Stok ID</label>
+            <input type="text" class="form-control" name="stok_id" placeholder="UZ00000001" required>
+        </div>
+        <div class="input">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="nama_buku">Judul Buku</label>
+                </div>
+                <select class="custom-select" name="nama_buku" id="nama_buku">
+                    <option selected>Uzumaki</option>
+                    <%for(buku of listBuku){%>
+                    <option value="<%=buku.NAMA_BUKU%>"><%=buku.NAMA_BUKU%></option>
+                    <%}%>
+                </select>
+            </div>
+        </div>
+        <div id="list-lokasi"></div>
+        <button type="submit" class="btn btn-primary input">Tambahkan Stok Buku</button>
+    </form>
+    
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            $("#list-lokasi").load("/elements/listLokasi.html");
+        });
+    </script>
+</body>
+
+</html>

@@ -7,7 +7,7 @@ const app = express();
 let status_login = false;
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 oracledb.fetchAsString = [oracledb.CLOB];
-let buku,mesin, pegawai, author,member;
+let buku,mesin, pegawai, author,member,rak;
 let connection;
 let bodyParser = require('body-parser');
 const configApp = () => {
@@ -64,6 +64,10 @@ const setGet = () => {
   app.get("/registrasi", (req, res) => {
     res.render("add_membership", { title: "Penambahan Membership"});
   });
+  app.get("/tambah_stok_buku", async (req, res) => {
+    await renderBuku();
+    res.render("add_stok_buku", { title: "Penambahan Stok Buku",listBuku:buku});
+  });
 }
 
 const setPost = () => {
@@ -102,18 +106,24 @@ const setPost = () => {
   });
   app.post("/register", async (req, res) => {
     let row = await getRow();
-    console.log(row);
     let digit = 10-row.length;
     row = parseInt(row) + 1;
     let id = "0".repeat(digit) + row.toString();
-    console.log(req.body.NIK);
-    console.log(id);
     sql = `BEGIN
           registrasi('${id}','${req.body.NIK}','${req.body.nama_plg}','${req.body.kelamin}',
                       TO_DATE('${req.body.tgl_lahir}','DD-MM-YYYY'),'${req.body.alamat}','${req.body.membership}');
           END;`;
     let temp = await insertData(sql,[]);
     res.redirect("/registrasi");
+  });
+  app.post("/add_stok", async (req, res) => {
+    sql = `insert into RAK(ID_RAK,LOKASI) values('${req.body.lantai+req.body.rak}','${req.body.lantai}')`;
+    let temp = await insertData(sql,[]);
+    sql = `BEGIN
+      ADDSTOK ( '${req.body.stok_id}','${req.body.nama_buku}', '${req.body.lantai+req.body.rak}', '0','${req.body.rak+req.body.baris}');
+     END;`;
+    temp = await insertData(sql,[]);
+    res.redirect("/tambah_stok_buku");
   });
 }
 

@@ -59,9 +59,7 @@ async function run() {
     let sql, binds, options, result;
 
     connection = await oracledb.getConnection(dbConfig);
-    sql = `BEGIN
-     REGISTRASI('0000000006','1234567891234567','WOW','L',TO_DATE('11-11-2012','DD-MM-YYYY'),'disini','1');
-     END;`;
+    sql = `insert into RAK values('FL001RK8','FL001')`;
 
     binds = [];
 
