@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <title>tes</title>
+    <h1>
+        <%= title %>
+    </h1>
+</head>
+
+<body>
+    <div class="mb-3">
+        <form class="form-inline" action="/p_mesin" method="post" style="width:50%;float:left;">
+            <div class="input">
+                <label for="id_plg" class="form-label">ID Pelanggan</label>
+                <input type="text" class="form-control" name="id_plg" placeholder="10-digit" required>
+            </div>
+            <div class="input" id="list-mesin">
+                <div class="input-group mb-3" id="auth">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="mesin">Sarana</label>
+                    </div>
+                    <select class="custom-select" name="mesin" id="mesin">
+                        <option selected></option>
+                        <%for(mesin of listMesin){%>
+                        <option value="<%=mesin.TIPE_MESIN%>"><%=mesin.TIPE_MESIN%></option>
+                        <%}%>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary input">Pinjam Mesin</button>
+        </form>
+    </div>
+
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(function () {
+            
+        });
+    </script>
+</body>
+
+</html>

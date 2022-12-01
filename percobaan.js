@@ -14,8 +14,8 @@ connectDb();
 async function connectDb(){
   try {
     connection = await oracledb.getConnection( {
-      user          : "tubes",
-      password      : "tubes",
+      user          : "TUBES",
+      password      : "TUBES",
       connectString : "localhost/xe"
     });
     sql = `SELECT nama_buku,genre_buku,jenis_buku from buku`;
@@ -30,10 +30,30 @@ async function connectDb(){
       // fetchArraySize:   100                 // internal buffer allocation size for tuning
     };
 
-    result = await connection.execute(sql, binds, options);
+    result = await getRow(`"p-buku"`);
+    console.log(result);
   } catch (err) {
     console.error(err);}
     console.log(result);
   }
 
 
+  async function getRow(table) {
+    console.log(table);
+    let sql = `select count(*) as total from ${table}`;
+    options = {
+      outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
+      autoCommit: true,
+      resultSet: true
+      // extendedMetaData: true,               // get extra metadata
+      // prefetchRows:     100,                // internal buffer allocation size for tuning
+      // fetchArraySize:   100                 // internal buffer allocation size for tuning
+    };
+    try {
+      let temp = await connection.execute(sql);
+      return JSON.parse(JSON.stringify(temp))["rows"][0].TOTAL.toString();
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }

@@ -6,7 +6,6 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 let status_login = false;
-let buku, mesin, pegawai, author, member, rak;
 let connection;
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
@@ -41,24 +40,23 @@ const configApp = () => {
 const setGet = () => {
   app.get("/", async (req, res) => {
     let data_status;
-    data_status = await renderBuku();
-    if (data_status) {
+    buku = await renderBuku();
+    if (buku != false) {
       res.render("index", { listBuku: buku, title: "OracleDb Simulation" });
       return true;
     }
     else {
       res.render("index", { title: "Error" });
-      return false;
     }
   });
 
   app.get("/add_buku", async (req, res) => {
-    await renderAuthor();
+    author = await renderAuthor();
     res.render("add_buku", { title: "Penambahan Buku", listAuthor: author });
   });
 
   app.get("/add_author", async (req, res) => {
-    await renderAuthor();
+    author = await renderAuthor();
     res.render("add_author", { title: "Penambahan Author", listAuthor: author });
   });
 
@@ -66,18 +64,19 @@ const setGet = () => {
     res.render("add_membership", { title: "Penambahan Membership" });
   });
   app.get("/tambah_stok_buku", async (req, res) => {
-    await renderBuku();
+    buku = await renderBuku();
     res.render("add_stok_buku", { title: "Penambahan Stok Buku", listBuku: buku });
   });
   app.get("/p-buku", async (req, res) => {
-    await renderBuku();
+    buku = await renderBuku();
     res.render("p-buku", { title: "Peminjaman Buku",listBuku:buku});
   });
   app.get("/pp-buku", async (req, res) => {
     res.render("pp-buku", { title: "Pengembalian Buku"});
   });
   app.get("/p-mesin", async (req, res) => {
-    res.render("p-mesin", { title: "Peminjaman Mesin"});
+    mesin = await renderMesin();
+    res.render("p-mesin", { title: "Peminjaman Mesin",listMesin:mesin});
   });
   app.get("/pp-mesin", async (req, res) => {
     res.render("pp-mesin", { title: "Pengembalian Mesin"});
@@ -111,10 +110,8 @@ const setPost = () => {
   });
   app.post("/tambah-author", async (req, res) => {
     console.log(req.body.nama_author);
-    let sql = `insert into penulis(nama) values(:1)`;
-    let binds = [req.body.nama_author];
-    console.log(binds);
-    await getData(sql, binds, "author");
+    let sql = `insert into penulis(nama) values('${req.body.nama_author}')`;
+    await getData(sql, []);
     res.redirect("/add_author");
   });
   app.post("/register", async (req, res) => {
@@ -139,25 +136,40 @@ const setPost = () => {
     res.redirect("/tambah_stok_buku");
   });
   app.post("/p_buku", async (req, res) => {
-    let row = await getRow(`layanan`);
-    let digit = 9 - row.length;
-    console.log(digit);
-    sRow = parseInt(row) + 1;
-    let id_layanan = "L"+ "0".repeat(digit) + sRow.toString();
-    row = await getRow(`"p-buku"`);
-    digit = 9 - row.length;
-    console.log(digit);
-    sRow = parseInt(row) + 1;
-    let id_peminjaman = "P" + "0".repeat(digit) + sRow.toString();
+    let id_layanan = await generateID(`layanan`,"L");
+    let id_peminjaman = await generateID(`"p-buku"`,"P");
+    console.log(id_layanan,id_peminjaman);
     sql = `BEGIN
       PINJAMBUKU ( '${id_layanan}','${req.body.id_plg}', '${id_peminjaman}','${req.body.nama_buku}');
      END;`;
     temp = await insertData(sql, []);
-    console.log(id_layanan,id_peminjaman,req.body);
+    res.redirect("/");
+  });
+  app.post("/pp_buku",async (req,res) =>{
+    sql = `BEGIN
+          ReturnBook('${req.body.id_buku}');
+           END;`;
+    temp = await insertData(sql,[]);
+    res.redirect("/");
+  });
+  app.post("/p_mesin",async (req,res) =>{
+    let id_layanan = await generateID(`layanan`,"L");
+    let id_peminjaman = await generateID(`P_MESIN`,"P");
+    sql = `BEGIN
+          PINJAMMESIN('${id_layanan}','${req.body.id_plg}','${id_peminjaman}','${req.body.mesin}');
+           END;`;
+    temp = await insertData(sql,[]);
     res.redirect("/");
   });
 }
 
+async function generateID(entity,id){
+  let temp = await getRow(entity);
+  console.log(temp);
+  let digit = 9 - temp.length;
+  let sRow = parseInt(temp) + 1;
+  return id + "0".repeat(digit) + sRow.toString();
+}
 async function connectDb() {
   try {
     connection = await oracledb.getConnection({
@@ -173,25 +185,25 @@ async function connectDb() {
 async function renderBuku() {
   sql = `SELECT nama_buku,genre_buku,jenis_buku,deskripsi FROM buku`;
   binds = [];
-  return getData(sql, binds, "buku");
+  return await getData(sql, binds);
 }
 async function renderAuthor() {
   sql = `SELECT NAMA FROM PENULIS`;
   binds = [];
-  return getData(sql, binds, "author");
+  return await getData(sql, binds);
 }
 async function renderMesin() {
   sql = `SELECT id_mesin,tipe_mesin,kondisi,status_peminjaman FROM mesin`;
   binds = [];
-  return getData(sql, binds, "mesin");
+  return await getData(sql, binds);
 }
 async function renderPegawai() {
   sql = `SELECT id_pustakawan,nama,status FROM pustakawan`;
   binds = [];
-  return getData(sql, binds, "pegawai");
+  return await getData(sql, binds);
 }
 
-async function getData(sql, binds, type) {
+async function getData(sql, binds) {
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
     autoCommit: true,
@@ -212,14 +224,6 @@ async function getData(sql, binds, type) {
         rows.push(row);
       }
       await tempResult.close();
-      switch (type) {
-        case "buku": buku = JSON.parse(JSON.stringify(rows)); break;
-        case "author": author = JSON.parse(JSON.stringify(rows)); break;
-        case "mesin": mesin = JSON.parse(JSON.stringify(rows)); break;
-        case "pegawai": pegawai = JSON.parse(JSON.stringify(rows)); break;
-        case "member": member = JSON.parse(JSON.stringify(rows)); break;
-        default: ;
-      }
     }
     else {
       options = {
@@ -232,7 +236,7 @@ async function getData(sql, binds, type) {
       };
       const tempQuery = await connection.executeMany(sql, binds, options);
     }
-    return true;
+    return JSON.parse(JSON.stringify(rows));
   }
   catch (err) {
     return false;
@@ -253,31 +257,21 @@ async function insertData(sql, binds) {
     if (binds.length <= 1) {
       if (binds.length == 1) { binds = binds[0]; }
       const rows = await connection.execute(sql, binds, options);
-
-      switch (type) {
-        case "buku": buku = JSON.parse(JSON.stringify(rows)); break;
-        case "author": author = JSON.parse(JSON.stringify(rows)); break;
-        case "mesin": mesin = JSON.parse(JSON.stringify(rows)); break;
-        case "pegawai": pegawai = JSON.parse(JSON.stringify(rows)); break;
-        case "member": member = JSON.parse(JSON.stringify(rows)); break;
-        default: ;
-      }
-      await tempResult.close();
     }
     else {
       const rows = await connection.executeMany(sql, binds, options);
     }
-    console.log(rows);
     return true;
   }
   catch (err) {
+    console.log(err);
     return false;
   }
 }
 
 async function getRow(table) {
+  console.log(table);
   let sql = `select count(*) as total from ${table}`;
-  let temp;
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
     autoCommit: true,
@@ -287,13 +281,11 @@ async function getRow(table) {
     // fetchArraySize:   100                 // internal buffer allocation size for tuning
   };
   try {
-    temp = await connection.execute(sql);
-    // For a complete list of options see the documentation.
-    if(isNaN((JSON.stringify(temp))["rows"][0].TOTAL)) return "0";
+    let temp = await connection.execute(sql);
     return JSON.parse(JSON.stringify(temp))["rows"][0].TOTAL.toString();
   }
   catch (err) {
-    return "0";
+    console.log(err);
   }
 }
 
