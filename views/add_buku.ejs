@@ -24,7 +24,7 @@
             <div class="input" id="list-jenis"></div>
             <div class="input" id="list-genre"></div>
             <div class="input" id="list-author">
-                <div class="input-group mb-3">
+                <div class="input-group mb-3" id="auth">
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="author_buku">Author</label>
                     </div>
@@ -51,7 +51,7 @@
             $("#list-jenis").load("elements/jenisBuku.html");
             $(".dropdown-toggle").dropdown();
             $('#btnAdd').click(function () {
-                $("#list-author").clone().prepend("#input-button");
+                $("#auth").clone().removeAttr("id").appendTo("#list-author");
             });
         });
     </script>

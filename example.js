@@ -59,17 +59,24 @@ async function run() {
     let sql, binds, options, result;
 
     connection = await oracledb.getConnection(dbConfig);
-    sql = `insert into RAK values('FL001RK8','FL001')`;
+    sql = 'insert into "penulis-buku"(buku_nama_buku,penulis_nama) values(:1,:2)';
 
-    binds = [];
+    binds = [["WWW","Hazard"],
+             ["WWW","Akasaka Aka"],
+             ["WWW","Junji Ito"]
+            ];
 
     // For a complete list of options see the documentation.
     options = {
       autoCommit: true,
       // batchErrors: true,  // continue processing even if there are data errors
+      bindDefs: [
+        { type: oracledb.STRING, maxSize:15 },
+        { type: oracledb.STRING, maxSize:15 }
+      ]
     };
 
-    result = await connection.execute(sql, binds, options);
+    result = await connection.executeMany(sql, binds, options);
     await connection.commit();
   } catch (err) {
     console.error(err);
