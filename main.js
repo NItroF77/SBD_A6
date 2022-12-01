@@ -165,7 +165,6 @@ const setPost = () => {
 
 async function generateID(entity,id){
   let temp = await getRow(entity);
-  console.log(temp);
   let digit = 9 - temp.length;
   let sRow = parseInt(temp) + 1;
   return id + "0".repeat(digit) + sRow.toString();
