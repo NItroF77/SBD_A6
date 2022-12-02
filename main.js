@@ -192,7 +192,7 @@ async function renderAuthor() {
   return await getData(sql, binds);
 }
 async function renderMesin() {
-  sql = `SELECT id_mesin,tipe_mesin,kondisi,status_peminjaman FROM mesin`;
+  sql = `SELECT id_mesin,tipe_mesin,kondisi,status_peminjaman FROM mesin where status_peminjaman = 0`;
   binds = [];
   return await getData(sql, binds);
 }
@@ -269,8 +269,7 @@ async function insertData(sql, binds) {
 }
 
 async function getRow(table) {
-  console.log(table);
-  let sql = `select count(*) as total from ${table}`;
+  sql = `select count(*) as total from ${table}`;
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
     autoCommit: true,
