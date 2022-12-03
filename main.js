@@ -1,7 +1,6 @@
 // myscript.js
 // This example uses Node 8's async/await syntax.
-
-const oracledb = require('oracledb');
+const oracledb =  require('oracledb');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -18,8 +17,8 @@ const configApp = () => {
   ));
   app.use('/assets', [
     express.static(__dirname + '/node_modules/jquery/dist/'),
-    express.static(__dirname + '/node_modules/poppers/dist/'),
-    express.static(__dirname + '/node_modules/bootstrap/dist/')
+    express.static(__dirname + '/node_modules/bootstrap/dist/'),
+    express.static(__dirname + '/node_modules/bootstrap/scss/')
   ]);
   app.use('/login-assets', [
     express.static(__dirname + '/etc/login/')
@@ -85,7 +84,8 @@ const setGet = () => {
 
 const setPost = () => {
   app.post("/post_buku", async (req, res) => {
-    sql = `insert into buku(nama_buku,genre_buku,jenis_buku) values(:1,:2,:3)`;
+    deskripsi = `'Dibuat oleh ${req.body.author_buku} \\n ${req.body.deskripsi}'`;
+    sql = `insert into buku(nama_buku,genre_buku,jenis_buku,deskripsi) values(:1,:2,:3,${deskripsi})`;
     binding = [[req.body.nama_buku, req.body.genre_buku, req.body.jenis_buku]];
     post_status = await getData(sql, binding);
     sql = 'insert into "penulis-buku"(buku_nama_buku,penulis_nama) values(:1,:2)';
@@ -98,7 +98,7 @@ const setPost = () => {
     else {
       binding.push([req.body.nama_buku, req.body.author_buku]);
     }
-    post_status = getData(sql, binding);
+    post_status = await getData(sql, binding);
     console.log(post_status);
     res.redirect("/");
   });

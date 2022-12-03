@@ -1,5 +1,15 @@
 body {
+    margin-top: 80px;
     justify-content: center;
+    background-image: url('background-img.jpg');
+    /* Full height */
+    height: 100%;
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment:fixed;
+
 }
 .container div{
   padding: 5px;
@@ -13,9 +23,12 @@ body {
     background-color: black;
 }
 .mid-page{
-    float: left;
     width: 70%;
-    display: grid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .right-page{
     float: right;
@@ -40,17 +53,10 @@ body {
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(5,minmax(160px,1fr));
-    grid-auto-rows: auto;     
-}
  
 .card {
+    height: 100%;
     font-size: 0.9em;
-    border-radius: 5px 5px 0 0;
-    overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 } 
 .card-title{
@@ -62,3 +68,21 @@ body {
     margin: 5px;
     overflow: visible;
 }
+.visible {
+  visibility: visible !important;
+}
+.invisible {
+  visibility: hidden !important;
+}
+.btn-narvar{
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+}
+.centered-element {
+    margin: 0;
+    transform: translateY(-50%);
+  }

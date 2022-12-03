@@ -8,39 +8,117 @@
     <!-- CSS only -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
     <link rel="stylesheet" href="style/main.css" />
-    <div id="navbar"></div>
+    <link rel="stylesheet" href="style/main.scss" />
+
 </head>
+
 <body>
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">Pustaka Nusantara</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarScroll">
+                <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+                    <li class="nav-item">
+                        <button id="l-buku" class="btn btn-dark active" aria-current="page">List Buku</button>
+                    </li>
+                    <li class="nav-item">
+                        <button id="l-mesin" class="btn btn-dark">List Mesin</button>
+                    </li>
+                    <li class="nav-item">
+                        <button id="about" class="btn btn-dark">Tentang Kami</button>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
     <div class="container-fluid">
         <div class="left-page">
             <div id="panel"></div>
         </div>
-        <div class="mid-page">
-            <div class="cards">
-                <%for (let buku of listBuku) {%>
-                        <div class="card border-secondary mb-3" style="width: 160px;">
-                            <div class="card-body">
-                                <h5 class="card-title"><%=buku.NAMA_BUKU%></h5>
-                                <p class="card-text"><%=buku.GENRE_BUKU%></p>
-                                <p class="card-text"><small class="text-muted"><%=buku.JENIS_BUKU%></small></p>
-                                <div class="d-flex justify-content-center">
-                                    <button type="button" class="btn btn-default" buku-bs-toggle="collapse" buku-bs-target="#deskripsi" aria-expanded="true" aria-controls="deskripsi">
-                                        <span class="glyphicon glyphicon-menu-down">Detail</span>
-                                    </button>
-                                 </div>
+        <div class="mid-page overflow-auto p-3 mb-3 mb-md-0 me-md-3">
+            <div id="buku-buku" class="row row-cols-1 row-cols-md-3 g-4">
+                <%let i=1;%>
+                    <%for (let buku of listBuku) {%>
+                        <div class="col">
+                            <div class="card border-secondary mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <%=buku.NAMA_BUKU%>
+                                    </h5>
+                                    <p class="card-text">
+                                        <%=buku.GENRE_BUKU%>
+                                    </p>
+                                    <p class="card-text"><small class="text-muted">
+                                            <%=buku.JENIS_BUKU%>
+                                        </small></p>
+                                    <div class="d-flex justify-content-center">
+                                        <button type="button" class="btn btn-default" data-bs-container="body"
+                                            data-bs-toggle="popover" data-bs-placement="bottom"
+                                            data-bs-title="<%=buku.NAMA_BUKU%>" data-bs-content-id="detail<%=i%>">
+                                            <span class="glyphicon glyphicon-menu-down">Detail</span>
+                                        </button>
+                                    </div>
+                                    <div class="d-none" id="detail<%=i%>">
+                                        <p>
+                                            <%=buku.DESKRIPSI%>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
+                            <%i++;%>
                         </div>
-                <%}%>
+                        <%}%>        
             </div>
+            <div id="mesin-mesin" class="d-none" style="margin-top:20px ;"></div>
         </div>
     </div>
-   
+
     <script src="assets/jquery.min.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
     <script>
         $(function () {
-            $("#navbar").load("elements/navigation.html");
+
             $("#panel").load("elements/user-panel.html");
+            $("#mesin-mesin").load("elements/list-mesin.html");
+        });
+    </script>
+    <script>
+        $("#l-buku").click(function () {
+            $("#l-buku").addClass("active");
+            $("#l-mesin").removeClass("active");
+            $("#buku-buku").removeClass("d-none");
+            $("#mesin-mesin").addClass("d-none");
+        });
+        $("#l-mesin").click(function () {
+            $("#l-buku").removeClass("active");
+            $("#l-mesin").addClass("active");
+            $("#buku-buku").addClass("d-none");
+            $("#mesin-mesin").removeClass("d-none");
+        });
+    </script>
+    <script>
+        const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+        const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+    </script>
+    <script>
+        const list = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        list.map((el) => {
+            let opts = {
+                animation: false,
+            }
+            if (el.hasAttribute('data-bs-content-id')) {
+                opts.content = document.getElementById(el.getAttribute('data-bs-content-id')).innerHTML;
+                opts.html = true;
+            }
+            new bootstrap.Popover(el, opts);
         });
     </script>
 </body>

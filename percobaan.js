@@ -9,6 +9,7 @@ app.set("views","views");
 let sql,binds,options,result;
 let connection;
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.fetchAsString = [oracledb.CLOB];
 connectDb();
 
 async function connectDb(){
@@ -18,7 +19,7 @@ async function connectDb(){
       password      : "TUBES",
       connectString : "localhost/xe"
     });
-    sql = `SELECT nama_buku,genre_buku,jenis_buku from buku`;
+    sql = `select * from buku`;
 
     binds = {};
 
@@ -30,11 +31,10 @@ async function connectDb(){
       // fetchArraySize:   100                 // internal buffer allocation size for tuning
     };
 
-    result = await getRow(`"p-buku"`);
+    result = await connection.execute(sql,binds,options);
     console.log(result);
   } catch (err) {
-    console.error(err);}
-    console.log(result);
+    console.error("error",err);}
   }
 
 

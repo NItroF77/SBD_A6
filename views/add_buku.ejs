@@ -15,29 +15,33 @@
 </head>
 
 <body>
-    <div class="mb-3">
-        <form class="form-inline" action="/post_buku" method="post" style="width:50%;float:left;">
+    <div class="mb-3 bg-img">
+        <form class="form-control form-inline" action="/post_buku" method="post" style="width:50%;float:left;">
             <div class="input">
                 <label for="nama_buku" class="form-label">Judul Buku</label>
                 <input type="text" class="form-control" name="nama_buku" placeholder="Harry Potter" required>
             </div>
             <div class="input" id="list-jenis"></div>
-            <div class="input" id="list-genre"></div>
+            <div class="input mb-3" id="list-genre"></div>
             <div class="input" id="list-author">
-                <div class="input-group mb-3" id="auth">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="author_buku">Author</label>
-                    </div>
-                    <select class="custom-select" name="author_buku" id="author_buku">
-                        <option selected></option>
-                        <%for(author of listAuthor){%>
-                        <option value="<%=author.NAMA%>"><%= author.NAMA %></option>
-                        <%}%>
-                    </select>
+            <div class="input-group mb-3" id="auth">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="author_buku">Author</label>
                 </div>
+                <select class="form-select form-select-lg mb-3" name="author_buku" id="author_buku">
+                    <option selected></option>
+                    <%for(author of listAuthor){%>
+                    <option value="<%=author.NAMA%>"><%= author.NAMA %></option>
+                    <%}%>
+                </select>
+            </div>
             </div>
             <div class="input-button">
                 <button id="btnAdd" type="button" class="btn btn-light btn-sm input">Tambah Author</button>
+            </div>
+            <div class="input">
+                <label for="deskripsi" class="form-label">Deskripsi Buku</label>
+                <textarea class="form-control" name="deskripsi" placeholder="Sinopsis,dll"></textarea>
             </div>
             <button type="submit" class="btn btn-primary input">Tambahkan Buku</button>
         </form>
