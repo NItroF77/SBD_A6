@@ -70,35 +70,20 @@
         </div>
     </nav>
     <div class="d-flex justify-content-center" style="margin-top: 60px;">
-        <form class="form-control form-inline shadow p-3 mb-5 bg-body rounded" action="/post_buku" method="post" style="width:50%;float:left;">
-            <h1 class="text-bg-primary p-3"><%= title %></h1>
-            <div class="input">
-                <label for="nama_buku" class="form-label">Judul Buku</label>
-                <input type="text" class="form-control" name="nama_buku" placeholder="Harry Potter" required>
-            </div>
-            <div class="input" id="list-jenis"></div>
-            <div class="input mb-3" id="list-genre"></div>
-            <div class="input" id="list-author">
-            <div class="input-group mb-3" id="auth">
+        <form class="form-control form-inline shadow p-3 mb-5 bg-body rounded" action="/add_mesin" method="post" style="width:50%;float:left;">
+            <div class="input-group mb-3">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="author_buku">Author</label>
+                    <label class="input-group-text" for="mesin">Tipe Mesin</label>
                 </div>
-                <select class="form-select form-select-lg mb-3" name="author_buku" id="author_buku">
+                <select class="form-select form-select-lg mb-3" name="mesin" id="mesin" required>
                     <option selected></option>
-                    <%for(author of listAuthor){%>
-                    <option value="<%=author.NAMA%>"><%= author.NAMA %></option>
-                    <%}%>
+                    <option value="FC">Fotocopy</option>
+                    <option value="PC">Komputer</option>
+                    <option value="SC">Scanner</option>
+                    <option value="PR">Printer</option>
                 </select>
             </div>
-            </div>
-            <div class="input-button">
-                <button id="btnAdd" type="button" class="btn btn-light btn-sm input">Tambah Author</button>
-            </div>
-            <div class="input">
-                <label for="deskripsi" class="form-label">Deskripsi Buku</label>
-                <textarea class="form-control" name="deskripsi" placeholder="Sinopsis,dll"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary input">Tambahkan Buku</button>
+            <button type="submit" class="btn btn-primary input">Tambahkan Mesin</button>
         </form>
     </div>
 

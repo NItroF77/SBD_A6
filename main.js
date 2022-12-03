@@ -59,34 +59,36 @@ const setGet = () => {
   });
   app.get("/add_buku", async (req, res) => {
     author = await renderAuthor();
-    res.render("add_buku", { title: "Penambahan Buku", listAuthor: author });
+    res.render("add_buku", { title: "Penambahan Buku", listAuthor: author,session:session});
   });
 
   app.get("/add_author", async (req, res) => {
     author = await renderAuthor();
-    res.render("add_author", { title: "Penambahan Author", listAuthor: author });
+    res.render("add_author", { title: "Penambahan Author", listAuthor: author,session:session});
   });
 
   app.get("/registrasi", (req, res) => {
-    res.render("add_membership", { title: "Penambahan Membership" });
+    res.render("add_membership", { title: "Penambahan Membership",session:session});
   });
   app.get("/tambah_stok_buku", async (req, res) => {
     buku = await renderBuku();
-    res.render("add_stok_buku", { title: "Penambahan Stok Buku", listBuku: buku });
+    res.render("add_stok_buku", { title: "Penambahan Stok Buku", listBuku: buku,session:session});
+  });
+  app.get("/tambah-mesin", async (req, res) => {
+    res.render("add_mesin", { title: "Penambahan Mesin",session:session});
   });
   app.get("/p-buku", async (req, res) => {
-    buku = await renderBuku();
-    res.render("p-buku", { title: "Peminjaman Buku",listBuku:buku});
+    res.render("p-buku", { title: "Peminjaman Buku",session:session});
   });
   app.get("/pp-buku", async (req, res) => {
-    res.render("pp-buku", { title: "Pengembalian Buku"});
+    res.render("pp-buku", { title: "Pengembalian Buku",session:session});
   });
   app.get("/p-mesin", async (req, res) => {
     mesin = await renderMesin();
-    res.render("p-mesin", { title: "Peminjaman Mesin",listMesin:mesin});
+    res.render("p-mesin", { title: "Peminjaman Mesin",listMesin:mesin,session:session});
   });
   app.get("/pp-mesin", async (req, res) => {
-    res.render("pp-mesin", { title: "Pengembalian Mesin"});
+    res.render("pp-mesin", { title: "Pengembalian Mesin",session:session});
   });
 }
 
@@ -106,7 +108,8 @@ const setPost = () => {
     else {
       binding.push([req.body.nama_buku, req.body.author_buku]);
     }
-    post_status = await getData(sql, binding);
+    console.log(binding);
+    post_status = await insertData(sql, binding);
     console.log(post_status);
     res.redirect("/");
   });
@@ -131,10 +134,8 @@ const setPost = () => {
     res.redirect("/add_author");
   });
   app.post("/register", async (req, res) => {
-    let row = await getRow("pelanggan");
-    let digit = 10 - row.length;
-    row = parseInt(row) + 1;
-    let id = "0".repeat(digit) + row.toString();
+    let id = await generateID("pelanggan","","");
+    console.log(id,req.body);
     sql = `BEGIN
           registrasi('${id}','${req.body.NIK}','${req.body.nama_plg}','${req.body.kelamin}',
                       TO_DATE('${req.body.tgl_lahir}','DD-MM-YYYY'),'${req.body.alamat}','${req.body.membership}');
@@ -151,12 +152,17 @@ const setPost = () => {
     temp = await insertData(sql, []);
     res.redirect("/tambah_stok_buku");
   });
+  app.post("/add_mesin",async(req,res) =>{
+    let id = await generateID("mesin",`${req.body.mesin}`,`where tipe_mesin = '${req.body.mesin}'`);
+    sql = `insert into mesin(id_mesin,tipe_mesin,kondisi,status_peminjaman) values('${id}','${req.body.mesin}','3','0')`;
+    temp = await insertData(sql,[]);
+    res.redirect("/");
+  });
   app.post("/p_buku", async (req, res) => {
-    let id_layanan = await generateID(`layanan`,"L");
-    let id_peminjaman = await generateID(`"p-buku"`,"P");
-    console.log(id_layanan,id_peminjaman);
+    let id_layanan = await generateID(`layanan`,"L","");
+    let id_peminjaman = await generateID(`"p-buku"`,"P","");
     sql = `BEGIN
-      PINJAMBUKU ( '${id_layanan}','${req.body.id_plg}', '${id_peminjaman}','${req.body.nama_buku}');
+      PINJAMBUKU ( '${req.body.id_buku}','${id_layanan}','${req.body.id_plg}', '${id_peminjaman}');
      END;`;
     temp = await insertData(sql, []);
     res.redirect("/");
@@ -169,20 +175,28 @@ const setPost = () => {
     res.redirect("/");
   });
   app.post("/p_mesin",async (req,res) =>{
-    let id_layanan = await generateID(`layanan`,"L");
-    let id_peminjaman = await generateID(`P_MESIN`,"P");
+    let id_layanan = await generateID(`layanan`,"L","");
+    let id_peminjaman = await generateID(`P_MESIN`,"P","");
     sql = `BEGIN
           PINJAMMESIN('${id_layanan}','${req.body.id_plg}','${id_peminjaman}','${req.body.mesin}');
            END;`;
     temp = await insertData(sql,[]);
     res.redirect("/");
   });
+  app.post("/pp_mesin",async (req,res) =>{
+  sql = `BEGIN
+  ReturnMesin('${req.body.id_mesin}');
+   END;`;
+  temp = await insertData(sql,[]);
+  res.redirect("/");
+  });
 }
 
-async function generateID(entity,id){
-  let temp = await getRow(entity);
-  let digit = 9 - temp.length;
+async function generateID(entity,id,condition){
+  let temp = await getRow(entity,condition);
+  let digit = 10 - id.length - temp.length;
   let sRow = parseInt(temp) + 1;
+  console.log(temp,id,sRow);
   return id + "0".repeat(digit) + sRow.toString();
 }
 async function connectDb() {
@@ -284,8 +298,8 @@ async function insertData(sql, binds) {
   }
 }
 
-async function getRow(table) {
-  sql = `select count(*) as total from ${table}`;
+async function getRow(table,condition) {
+  sql = `select count(*) as total from ${table} ${condition}`;
   options = {
     outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
     autoCommit: true,
@@ -302,7 +316,6 @@ async function getRow(table) {
     console.log(err);
   }
 }
-
 
 
 function run() {
