@@ -1,4 +1,4 @@
-body {
+.body-default {
     margin-top: 80px;
     justify-content: center;
     background-image: url('background-img.jpg');
@@ -11,6 +11,16 @@ body {
     background-attachment:fixed;
 
 }
+.gradient-custom {
+    /* fallback for old browsers */
+    background: #6a11cb;
+    
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+    
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+    }
 .container div{
   padding: 5px;
   border: 1px solid black;

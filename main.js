@@ -5,6 +5,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 let status_login = false;
+session = {login_stat :"Login",action:"/login",method:"get"};
 let connection;
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
@@ -29,6 +30,7 @@ const configApp = () => {
   app.use('/style', [
     express.static(__dirname + '/views/style')
   ]);
+  app.use(express.json());
   app.listen(1522, () => {
     console.log("server ready");
   });
@@ -38,17 +40,23 @@ const configApp = () => {
 
 const setGet = () => {
   app.get("/", async (req, res) => {
-    let data_status;
+    if(status_login){session = {login_stat :"Logout",action:"/logout",method:"post"};}
+    else{session = {login_stat :"Login",action:"/login",method:"get"};}
     buku = await renderBuku();
     if (buku != false) {
-      res.render("index", { listBuku: buku, title: "OracleDb Simulation" });
+      res.render("index", { listBuku: buku, title: "OracleDb Simulation",session:session});
       return true;
     }
     else {
       res.render("index", { title: "Error" });
     }
   });
-
+  app.get("/login",(req,res) =>{
+    if(status_login){
+      res.redirect("/");
+    }
+    else{res.render("login",{Alert:"d-none"});}
+  });
   app.get("/add_buku", async (req, res) => {
     author = await renderAuthor();
     res.render("add_buku", { title: "Penambahan Buku", listAuthor: author });
@@ -103,10 +111,18 @@ const setPost = () => {
     res.redirect("/");
   });
   app.post("/login-user", (req, res) => {
-    if (connectDb(req.body.username, req.body.password)) {
-      status_login = true;
+    if(req.body.username == "adm" && req.body.password =="adm"){
+      status_login=true;
       res.redirect("/");
     }
+  res.render("login",{Alert:""});
+  });
+  app.post("/logout",(req,res) =>{
+    status_login = false;
+    session.login_stat = "Login";
+    session.action = "/login";
+    session.method = "get";
+    res.redirect("/");
   });
   app.post("/tambah-author", async (req, res) => {
     console.log(req.body.nama_author);
