@@ -19,13 +19,14 @@ async function connectDb(){
       password      : "TUBES",
       connectString : "localhost/xe"
     });
-    sql = `select * from buku`;
+    sql = `update buku set deskripsi = '4321' where nama_buku = 'WORLD'`;
 
     binds = {};
 
     // For a complete list of options see the documentation.
     options = {
       outFormat: oracledb.OUT_FORMAT_OBJECT,   // query result format
+      autoCommit : true
       // extendedMetaData: true,               // get extra metadata
       // prefetchRows:     100,                // internal buffer allocation size for tuning
       // fetchArraySize:   100                 // internal buffer allocation size for tuning

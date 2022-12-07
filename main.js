@@ -70,6 +70,10 @@ const setGet = () => {
   app.get("/registrasi", (req, res) => {
     res.render("add_membership", { title: "Penambahan Membership",session:session});
   });
+  app.get("/sunting-buku", async (req, res) => {
+    buku = await renderBuku();
+    res.render("sunting-buku", { title: "Sunting Info Buku", listBuku: buku,session:session});
+  });
   app.get("/tambah_stok_buku", async (req, res) => {
     buku = await renderBuku();
     res.render("add_stok_buku", { title: "Penambahan Stok Buku", listBuku: buku,session:session});
@@ -142,6 +146,11 @@ const setPost = () => {
           END;`;
     let temp = await insertData(sql, []);
     res.redirect("/registrasi");
+  });
+  app.post("/sunting_buku", async (req, res) => {
+    sql = `update buku set deskripsi = '${req.body.deskripsi}',genre_buku ='${req.body.genre_buku}',jenis_buku = '${req.body.jenis_buku}' where nama_buku = '${req.body.nama_buku}'`
+    temp = await insertData(sql,[]);
+    res.redirect("/");
   });
   app.post("/add_stok", async (req, res) => {
     sql = `insert into RAK(ID_RAK,LOKASI) values('${req.body.lantai + req.body.rak}','${req.body.lantai}')`;

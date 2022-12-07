@@ -1,13 +1,57 @@
-<p>
-  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-    Link with href
-  </a>
-  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-    Button with data-bs-target
-  </button>
-</p>
-<div class="collapse" id="collapseExample">
-  <div class="card card-body">
-    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark">
+  <div class="container-fluid">
+      <a class="navbar-brand" href="">Pustaka Nusantara</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+          aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarScroll">
+          <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Pelanggan
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/registrasi">Registrasi Pelanggan</a></li>
+                  </ul>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Buku
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/add_buku">Tambah Buku</a></li>
+                    <li><a class="dropdown-item" href="/add_author">Tambah Author</a></li>
+                    <li><a class="dropdown-item" href="/tambah_stok_buku">Tambah Stok Buku</a></li>
+                  </ul>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Mesin
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/tambah-mesin">Tambah Mesin</a></li>
+                  </ul>
+              </li>
+              <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Peminjaman
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/p-buku">Peminjaman Buku</a></li>
+                    <li><a class="dropdown-item" href="/pp-buku">Pengembalian Buku</a></li>
+                    <li><a class="dropdown-item" href="/p-mesin">Peminjaman Mesin</a></li>
+                    <li><a class="dropdown-item" href="/pp-mesin">Pengembalian Mesin</a></li>
+                  </ul>
+              </li>
+          </ul>
+          <form class="d-flex" role="search">
+              <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+              <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+          <form action="<%=session.action%>" method="<%=session.method%>">
+              <button class="btn btn-primary" id="<%=session.login_stat%>" style="margin-left:5px"><%=session.login_stat%></button>
+          </form>
+      </div>
   </div>
-</div>
+</nav>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="style/main.css" />
+    <title>tes</title>
+    <h1>
+        <%= title %>
+    </h1>
+</head>
+
+<body>
+    <div class="mb-3">
+        <div class="d-flex justify-content-center" style="margin-top: 60px;">
+            <form class="form-control form-inline shadow p-3 mb-5 bg-body rounded" action="/sunting_buku" method="post" style="width:50%;float:left;">
+                <h1 class="text-bg-primary p-3"><%= title %></h1>
+                <div class="input">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="nama_buku">Judul Buku</label>
+                        </div>
+                        <select class="custom-select" name="nama_buku" id="nama_buku">
+                            <option selected></option>
+                            <%for(buku of listBuku){%>
+                            <option value="<%=buku.NAMA_BUKU%>"><%=buku.NAMA_BUKU%></option>
+                            <%}%>
+                        </select>
+                    </div>
+                </div>
+                <div class="input" id="list-jenis"></div>
+                <div class="input mb-3" id="list-genre"></div>
+                <div class="input">
+                    <label for="deskripsi" class="form-label">Deskripsi Buku</label>
+                    <textarea class="form-control" name="deskripsi" placeholder="Sinopsis,dll"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary input">Sunting Buku</button>
+            </form>
+        </div>
+    </div>
+    <script src="assets/jquery.min.js"></script>
+    <script src="assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+       $(function () {
+            $("#list-genre").load("elements/genreBuku.html");
+            $("#list-jenis").load("elements/jenisBuku.html");
+            $("#panel").load("elements/user-panel.html");
+            $(".dropdown-toggle").dropdown();
+        });
+    </script>
+</body>
+
+</html>
